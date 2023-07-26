@@ -20,10 +20,10 @@ import matplotlib.pyplot as plt
 # requirement: networkx
 import networkx as nx
 
+from itertools import product
 import io
 import copy
 import csv
-import itertools
 import math
 import os
 import operator
@@ -438,7 +438,7 @@ def printdist(jd, bn, normalize=True):
     zipover = [i / s for i in jd.vals] if normalize else jd.vals
 
     # creates the cartesian product
-    k = [a + [b] for a, b in zip([list(i) for i in itertools.product(*x[::-1])], zipover)]
+    k = [a + [b] for a, b in zip([list(i) for i in product(*x[::-1])], zipover)]
 
     # make a dataframe
     df = pd.DataFrame.from_records(k, columns=[i for i in reversed(jd.scope)] + ["probability"])

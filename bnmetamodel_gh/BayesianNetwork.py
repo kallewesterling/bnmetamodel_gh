@@ -16,7 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import copy
-import itertools
+from itertools import product
 
 
 class BayesianNetwork:
@@ -423,7 +423,7 @@ class BayesianNetwork:
 
             allstates.append(states)
 
-        sequence = list(itertools.product(*allstates))
+        sequence = list(product(*allstates))
         sequenceDict = {}
         for name in evidence.keys():
             sequenceDict[name] = []
@@ -606,7 +606,7 @@ class BayesianNetwork:
                 states.append(j)
             allstates.append(states)
 
-        sequence = list(itertools.product(*allstates))
+        sequence = list(product(*allstates))
 
         sequenceDict = {}
         for name in evidence.keys():
