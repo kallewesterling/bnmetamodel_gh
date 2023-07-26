@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from .Helper_functions import getBinRanges, discretize
 
 import csv
@@ -45,7 +47,7 @@ class BNdata:
         self.numBinsDict = numBinsDict
         self.binTypeDict = binTypeDict
 
-        print "importing data from csv file ..."
+        print("importing data from csv file ...")
 
         if isinstance(csvdata, basestring):
             # data is a filepath
@@ -67,7 +69,7 @@ class BNdata:
                         item = float(dataset[i][j])
                         row.append(item)
                 csvD.append(row)
-            # print np.array(data).astype(np.float)
+            # print(np.array(data).astype(np.float))
 
             self.dataArray = csvD
             self.data = pd.DataFrame(data=csvD[1:], columns=csvD[0])
@@ -77,7 +79,7 @@ class BNdata:
 
             self.dataArray = csvdata
 
-        print "importing data from csv file completed"
+        print("importing data from csv file completed")
 
         ##################################################################
         # range discretization using equal or percentile binning
@@ -100,11 +102,11 @@ class BNdata:
         #    for var in binRanges:
         #        self.numBinsDict[var]=len(binRanges[var])
 
-        print "binning data ..."
+        print("binning data ...")
 
         datadf, datadict, bincountsdict = discretize(self.data, self.binRanges, True)
 
-        print "binning data complete"
+        print("binning data complete")
 
         self.binnedDict, self.binnedData, self.bincountsDict = datadf, datadict, bincountsdict
 
@@ -129,7 +131,7 @@ class BNdata:
                     item = float(dataset[i][j])
                     row.append(item)
             data.append(row)
-        # print np.array(data).astype(np.float)
+        # print(np.array(data).astype(np.float))
         self.data = data
 
         return data
@@ -153,7 +155,7 @@ class BNdata:
         # trainingDf = pd.DataFrame(self.data)
         # trainingDf.columns = trainingDf.iloc[0]
         # trainingDf = trainingDf[1:]
-        # print trainingDf
+        # print(trainingDf)
 
         trainingDfDiscterizedRanges = []
         trainingDfDiscterizedRangesDict = {}
@@ -200,7 +202,7 @@ class BNdata:
         # df = pd.DataFrame(data)
         # df.columns = df.iloc[0]
         # df = df [1:]
-        # print df
+        # print(df)
 
         binnedDf = pd.DataFrame().reindex_like(self.data)
 
@@ -226,17 +228,17 @@ class BNdata:
                     ############ bin training data #############
 
                     if binRange[0] <= item1 <= binRange[1]:
-                        # print item1, " lies within ", binRange
+                        # print(item1, " lies within ", binRange)
                         binnedDf.iloc[index][varName] = i
                         binCountsDict[varName][i][0] += 1
 
                     if i == 0 and binRange[0] > item1:
-                        # print "the value ", item1, "is smaller than the minimum bin", binRange[0]
+                        # print("the value ", item1, "is smaller than the minimum bin", binRange[0])
                         binnedDf.iloc[index][varName] = i
                         binCountsDict[varName][i][0] += 1
 
                     if i == len(discreteRanges) - 1 and binRange[1] < item1:
-                        # print "the value ", item1, "is larger than the maximum bin", binRange[1]
+                        # print("the value ", item1, "is larger than the maximum bin", binRange[1])
                         binnedDf.iloc[index][varName] = i
                         binCountsDict[varName][i][0] += 1
 
@@ -245,8 +247,8 @@ class BNdata:
         binnedData = binnedDf.to_dict(orient="records") # a list of dictionaries
         self.binnedData = binnedData
 
-        print "train binCountdict ", binCountsDict
-        print "binned_trainingData ", binnedData
+        print("train binCountdict ", binCountsDict)
+        print("binned_trainingData ", binnedData)
 
         return binnedData
     """

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from .BayesianNetwork import *
 from .BNdata import *
 from .Helper_functions import loadDataFromCSV

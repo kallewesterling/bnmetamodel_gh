@@ -1,12 +1,14 @@
+from __future__ import print_function
+
 # requirement: sklearn
 import sklearn
 from sklearn.metrics import mean_squared_error
 
-# requirement: libpgm
-from libpgm.graphskeleton import GraphSkeleton
-from libpgm.discretebayesiannetwork import DiscreteBayesianNetwork
-from libpgm.tablecpdfactorization import TableCPDFactorization
-from libpgm.pgmlearner import PGMLearner
+# requirement: libpgm3
+from libpgm3.graphskeleton import GraphSkeleton
+from libpgm3.discretebayesiannetwork import DiscreteBayesianNetwork
+from libpgm3.tablecpdfactorization import TableCPDFactorization
+from libpgm3.pgmlearner import PGMLearner
 
 # requirement: pandas
 import pandas as pd
@@ -54,7 +56,9 @@ def discrete_estimatebn(learner, data, skel, pvalparam=0.05, indegree=0.5):
     bn : Object
         The estimated Bayesian Network with learned parameters.
     """
-    assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
+    assert (
+        isinstance(data, list) and data and isinstance(data[0], dict)
+    ), "Arg must be a list of dicts."
 
     # learn graph skeleton
     # skel = self.discrete_constraint_estimatestruct(data, pvalparam = pvalparam, indegree = indegree)
@@ -64,6 +68,7 @@ def discrete_estimatebn(learner, data, skel, pvalparam=0.05, indegree=0.5):
 
     # return
     return bn
+
 
 def alphanum_key(s):
     """
@@ -84,6 +89,7 @@ def alphanum_key(s):
     key[1::2] = map(int, key[1::2])
     return key
 
+
 def len_csvdata(csv_file_path):
     """
     Returns the number of rows in a CSV file.
@@ -101,7 +107,7 @@ def len_csvdata(csv_file_path):
     data = []
 
     with io.open(csv_file_path, "rb") as f:
-        reader = csv.reader(f, dialect = csv.excel)
+        reader = csv.reader(f, dialect=csv.excel)
 
         for row in reader:
             data.append(row)
@@ -109,6 +115,7 @@ def len_csvdata(csv_file_path):
     length = len(data)
 
     return length
+
 
 def loadDataFromCSV(csv_file_path, header=False):
     """
@@ -138,7 +145,7 @@ def loadDataFromCSV(csv_file_path, header=False):
             dataset.append(row)
 
     data = []
-    if (header == True):
+    if header == True:
         data.append(dataset[0])
 
     for i in range(0, len(dataset)):
@@ -150,9 +157,10 @@ def loadDataFromCSV(csv_file_path, header=False):
                 item = float(dataset[i][j])
                 row.append(item)
         data.append(row)
-    # print np.array(data).astype(np.float)
-    # print data
+    # print(np.array(data).astype(np.float))
+    # print(data)
     return data
+
 
 def ranges(data):
     """
@@ -169,7 +177,9 @@ def ranges(data):
         A dictionary with the keys from the original dictionaries and the value
         being a list of two elements [min, max].
     """
-    assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
+    assert (
+        isinstance(data, list) and data and isinstance(data[0], dict)
+    ), "Arg must be a list of dicts."
     cdata = copy.deepcopy(data)
     # establish ranges
     ranges = dict()
@@ -183,6 +193,7 @@ def ranges(data):
                 ranges[var][1] = round(sample[var], 1)
 
     return ranges
+
 
 def bins(max, min, numBins):
     """
@@ -210,12 +221,13 @@ def bins(max, min, numBins):
         a = round(max - (increment * i), 20)
 
         b = round(max - (increment * (i + 1)), 20)
-        # print "b", b
-        # print "a", a
+        # print("b", b)
+        # print("a", a)
 
         bin_ranges.append([b, a])
-    # print bin_ranges
+    # print(bin_ranges)
     return bin_ranges
+
 
 def percentile_bins(array, numBins):
     """
@@ -240,20 +252,20 @@ def percentile_bins(array, numBins):
     bin_widths = [0]
     bin_ranges = []
     for i in range(0, numBins):
-        p_min = round ((np.percentile(a, (percentage * i))), 20)
-        # print "p_min ", p_min
+        p_min = round((np.percentile(a, (percentage * i))), 20)
+        # print("p_min ", p_min)
         bin_widths.append(p_min)
         p_max = round((np.percentile(a, (percentage * (i + 1)))), 20)
-        # print "p_max ", p_max
+        # print("p_max ", p_max)
         bin_ranges.append([round(p_min, 20), round(p_max, 20)])
 
-
-    # print bin_ranges
+    # print(bin_ranges)
 
     # plt.hist(a, bins=bin_widths)
 
     # plt.show()
     return bin_ranges
+
 
 def draw_barchartpd(binranges, probabilities):
     """
@@ -278,7 +290,7 @@ def draw_barchartpd(binranges, probabilities):
         for val in range:
             combined.append(val)
     # Convert to a set and back into a list.
-    print combined
+    print(combined)
     sett = set(combined)
     xticks = list(sett)
     xticks.sort()
@@ -289,25 +301,21 @@ def draw_barchartpd(binranges, probabilities):
     edge = []
     # edge.append(binranges[0][len(binranges[0])-1])
     for index, range in enumerate(binranges):
-        print "range ", range
+        print("range ", range)
         edge.append(range[0])
-        widths.append(range[1]-range[0])
-        xticksv.append(((range[1]-range[0]) / 2) + range[0])
+        widths.append(range[1] - range[0])
+        xticksv.append(((range[1] - range[0]) / 2) + range[0])
 
         if index == len(binranges) - 1:
             edge.append(range[1])
 
-    print "xticks ", xticksv
-    print "probabilities ", probabilities
-    print "edge ", edge
+    print("xticks ", xticksv)
+    print("probabilities ", probabilities)
+    print("edge ", edge)
 
     b = plt.bar(
-        xticksv,
-        probabilities,
-        align="center",
-        width=widths,
-        color="black",
-        alpha=0.2)
+        xticksv, probabilities, align="center", width=widths, color="black", alpha=0.2
+    )
 
     # plt.bar(
     #   xticksv,
@@ -324,7 +332,19 @@ def draw_barchartpd(binranges, probabilities):
 
     return b
 
-def draw_histograms(df, binwidths, n_rows, n_cols, maintitle, xlabel, ylabel, displayplt = False, saveplt = False, **kwargs):
+
+def draw_histograms(
+    df,
+    binwidths,
+    n_rows,
+    n_cols,
+    maintitle,
+    xlabel,
+    ylabel,
+    displayplt=False,
+    saveplt=False,
+    **kwargs
+):
     """
     Draw histograms for each variable in the dataframe.
 
@@ -368,20 +388,20 @@ def draw_histograms(df, binwidths, n_rows, n_cols, maintitle, xlabel, ylabel, di
 
     i = 0
     for var_name in list(df):
-        # print df
-        ax = fig.add_subplot(n_rows, n_cols, i+1)
+        # print(df)
+        ax = fig.add_subplot(n_rows, n_cols, i + 1)
 
         if isinstance(binwidths, int) == True:
             # minv = min(df[var_name])
             # maxv = max(df[var_name])
             # df[var_name].hist(bins = np.arange(minv, maxv + binwidths, binwidths), ax = ax)
-            print "binwidths ", binwidths
+            print("binwidths ", binwidths)
 
-            df[var_name].hist(bins = binwidths, ax = ax, color="black")
+            df[var_name].hist(bins=binwidths, ax=ax, color="black")
             # df[var_name].plot(kind="kde", ax = ax, secondary_y = False, grid = None, lw=0.5)
 
         else:
-            df[var_name].hist(bins = binwidths[var_name], ax=ax, color="black")
+            df[var_name].hist(bins=binwidths[var_name], ax=ax, color="black")
             # df[var_name].plot(kind="kde", ax = ax, secondary_y = False, grid = None, lw=0.5)
 
         ax.grid(color="0.2", linestyle=":", linewidth=0.1, dash_capstyle="round")
@@ -411,7 +431,13 @@ def draw_histograms(df, binwidths, n_rows, n_cols, maintitle, xlabel, ylabel, di
         plt.show()
 
     if saveplt == True:
-        fig.savefig("/Users/zack_sutd/Dropbox/SUTD/PhD/Thesis/Phase 2/Simple_truss/Plots/"+str(maintitle)+".png", dpi=400)
+        fig.savefig(
+            "/Users/zack_sutd/Dropbox/SUTD/PhD/Thesis/Phase 2/Simple_truss/Plots/"
+            + str(maintitle)
+            + ".png",
+            dpi=400,
+        )
+
 
 def printdist(jd, bn, normalize=True):
     """
@@ -441,9 +467,12 @@ def printdist(jd, bn, normalize=True):
     k = [a + [b] for a, b in zip([list(i) for i in product(*x[::-1])], zipover)]
 
     # make a dataframe
-    df = pd.DataFrame.from_records(k, columns=[i for i in reversed(jd.scope)] + ["probability"])
+    df = pd.DataFrame.from_records(
+        k, columns=[i for i in reversed(jd.scope)] + ["probability"]
+    )
 
     return df
+
 
 def kfoldToList(indexList, csvData, header):
     """
@@ -465,12 +494,13 @@ def kfoldToList(indexList, csvData, header):
     """
 
     list = []
-    # print "header ", header
+    # print("header ", header)
     list.append(header)
     for i in range(0, len(indexList)):
         list.append(csvData[indexList[i]])
 
     return list
+
 
 def kfoldToDF(indexList, dataframe):
     """
@@ -489,12 +519,13 @@ def kfoldToDF(indexList, dataframe):
         DataFrame of data for the k-fold cross-validation.
     """
 
-    df = pd.DataFrame(index = range(0, len(indexList)), columns=dataframe.columns)
+    df = pd.DataFrame(index=range(0, len(indexList)), columns=dataframe.columns)
 
     for index, dfindex in enumerate(indexList):
         df.iloc[index] = dataframe.iloc[dfindex]
 
     return df
+
 
 def without_keys(d, keys):
     """
@@ -514,7 +545,14 @@ def without_keys(d, keys):
     """
     return {x: d[x] for x in d if x not in keys}
 
-def distribution_distance_error(correct_bin_locations, predicted_bin_probabilities, actual_values, bin_ranges, plot = False):
+
+def distribution_distance_error(
+    correct_bin_locations,
+    predicted_bin_probabilities,
+    actual_values,
+    bin_ranges,
+    plot=False,
+):
     """
     Computes the normalized distance error for each value in the predicted
     probability distribution.
@@ -564,17 +602,19 @@ def distribution_distance_error(correct_bin_locations, predicted_bin_probabiliti
         # distance between actual value and bin mean
         distance_error = abs(output_bin_means[index] - actual_values[i])
 
-        norm_distance_error = (distance_error - bin_ranges[0][0]) / (bin_ranges[len(bin_ranges) - 1][1] - bin_ranges[0][0])
+        norm_distance_error = (distance_error - bin_ranges[0][0]) / (
+            bin_ranges[len(bin_ranges) - 1][1] - bin_ranges[0][0]
+        )
 
         distance_errors.append(distance_error)
 
         # remove 100 to normalise
         norm_distance_errors.append(norm_distance_error * 100)
 
-        # print "distance_error", distance_error
-        # print "max def value ", bin_ranges[len(bin_ranges) - 1][1]
-        # print "min def value ", bin_ranges[0][0]
-        # print "normalised distance error ", norm_distance_error
+        # print("distance_error", distance_error)
+        # print("max def value ", bin_ranges[len(bin_ranges) - 1][1])
+        # print("min def value ", bin_ranges[0][0])
+        # print("normalised distance error ", norm_distance_error)
 
     if plot == True:
         plt.hist(norm_distance_errors, bins=15)
@@ -583,6 +623,7 @@ def distribution_distance_error(correct_bin_locations, predicted_bin_probabiliti
 
     return norm_distance_errors
     # return distance_errors
+
 
 def graph_to_pdf(nodes, edges, name):
     """
@@ -601,7 +642,8 @@ def graph_to_pdf(nodes, edges, name):
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
     nx.drawing.nx_pydot.write_dot(G, name + ".dot")
-    os.system("dot -Tpdf %s > %s" % (name+".dot", name+".pdf"))
+    os.system("dot -Tpdf %s > %s" % (name + ".dot", name + ".pdf"))
+
 
 def discrete_mle_estimateparams2(graphskeleton, data):
     """
@@ -661,10 +703,14 @@ def discrete_mle_estimateparams2(graphskeleton, data):
         result = learner.discrete_mle_estimateparams(skel, data)
 
         # output
-        print json.dumps(result.Vdata, indent=2)
+        print(json.dumps(result.Vdata, indent=2))
     """
-    assert (isinstance(graphskeleton, GraphSkeleton)), "First arg must be a loaded GraphSkeleton class."
-    assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Second arg must be a list of dicts."
+    assert isinstance(
+        graphskeleton, GraphSkeleton
+    ), "First arg must be a loaded GraphSkeleton class."
+    assert (
+        isinstance(data, list) and data and isinstance(data[0], dict)
+    ), "Second arg must be a list of dicts."
 
     # instantiate Bayesian network, and add parent and children data
     bn = DiscreteBayesianNetwork()
@@ -679,19 +725,19 @@ def discrete_mle_estimateparams2(graphskeleton, data):
 
         # make placeholders for vals, cprob, and numoutcomes
         bn.Vdata[vertex]["vals"] = []
-        if (bn.Vdata[vertex]["parents"] == []):
+        if bn.Vdata[vertex]["parents"] == []:
             bn.Vdata[vertex]["cprob"] = []
         else:
             bn.Vdata[vertex]["cprob"] = dict()
 
         bn.Vdata[vertex]["numoutcomes"] = 0
 
-    # print "1 ------"
+    # print("1 ------")
 
     # determine which outcomes are possible for each node
     for sample in data:
         for vertex in bn.V:
-            if (sample[vertex] not in bn.Vdata[vertex]["vals"]):
+            if sample[vertex] not in bn.Vdata[vertex]["vals"]:
                 bn.Vdata[vertex]["vals"].append(sample[vertex])
                 bn.Vdata[vertex]["numoutcomes"] += 1
 
@@ -710,10 +756,10 @@ def discrete_mle_estimateparams2(graphskeleton, data):
                 ckey.append(str(val))
                 addlevel(vertex, _dict, ckey, depth + 1, totaldepth)
 
-    # print "2 ------"
+    # print("2 ------")
     # put [0, 0] at each entry of cprob table
     for vertex in bn.V:
-        if (bn.Vdata[vertex]["parents"]):
+        if bn.Vdata[vertex]["parents"]:
             root = bn.Vdata[vertex]["cprob"]
             numparents = len(bn.Vdata[vertex]["parents"])
             addlevel(vertex, root, [], 0, numparents)
@@ -721,15 +767,15 @@ def discrete_mle_estimateparams2(graphskeleton, data):
             for _ in range(bn.Vdata[vertex]["numoutcomes"]):
                 bn.Vdata[vertex]["cprob"].append([0, 0])
 
-    # print "3 ------"
+    # print("3 ------")
     # fill out entries with samples:
     for sample in data:
         for vertex in bn.V:
-            # print "vertex ", vertex
+            # print("vertex ", vertex)
 
             # compute index of result
             rindex = bn.Vdata[vertex]["vals"].index(sample[vertex])
-            # print "rindex ", rindex
+            # print("rindex ", rindex)
 
             # go to correct place in Vdata
             if bn.Vdata[vertex]["parents"]:
@@ -744,22 +790,22 @@ def discrete_mle_estimateparams2(graphskeleton, data):
 
             # increase numerator for current outcome
             lev[rindex][0] += 1
-            # print "lev ", lev
+            # print("lev ", lev)
 
-    # print "4 ------"
+    # print("4 ------")
     ######################################################
     # LAPLACE SMOOTHING TO AVOID ZERO DIVISION ERROR WHEN WE HAVE EMPTY BINS
     ######################################################
     for vertex in bn.V:
-        # print "vertex ", vertex
-        # print bn.V[vertex]
+        # print("vertex ", vertex)
+        # print(bn.V[vertex])
         numBins = bn.Vdata[vertex]["numoutcomes"]
 
         if not (bn.Vdata[vertex]["parents"]):
             # has no parents
-        #    for i in range(len(bn.Vdata[vertex]["cprob"])):
-        #        bn.Vdata[vertex]["cprob"][i][0] += 1  # numerator (count)
-        #        bn.Vdata[vertex]["cprob"][i][1] += numBins  # denomenator (total count)
+            #    for i in range(len(bn.Vdata[vertex]["cprob"])):
+            #        bn.Vdata[vertex]["cprob"][i][0] += 1  # numerator (count)
+            #        bn.Vdata[vertex]["cprob"][i][1] += numBins  # denomenator (total count)
 
             for counts in bn.Vdata[vertex]["cprob"]:
                 counts[0] += 1  # numerator (count)
@@ -773,44 +819,51 @@ def discrete_mle_estimateparams2(graphskeleton, data):
                     counts[0] += 1
                     counts[1] += numBins
 
-            # print "5 ------"
+            # print("5 ------")
             """
             # OPTIONAL: converts cprob from dict into df, does laplace smoothing, then (missing) maps back to dict
             bincounts = pd.DataFrame.from_dict(bn.Vdata[vertex]["cprob"], orient="index")
-            # print bincounts
+            # print(bincounts)
 
             for columnI in range(0, bincounts.shape[1]):
                 for rowI in range(0, bincounts.shape[0]):
                     bincounts[columnI][rowI]=[bincounts[columnI][rowI][0]+1, bincounts[columnI][rowI][1]+numBins]
-            # print bincounts
+            # print(bincounts)
             """
 
-    # print "max def ", bn.Vdata["max_def"]
-    # print "EAx ", bn.Vdata["EAx"]
-    # print "EAy ", bn.Vdata["EAy"]
-    # print "mass ", bn.Vdata["mass"]
-    # print "cog_x ", bn.Vdata["cog_x"]
-    # print "cog_z ", bn.Vdata["cog_z"]
+    # print("max def ", bn.Vdata["max_def"])
+    # print("EAx ", bn.Vdata["EAx"])
+    # print("EAy ", bn.Vdata["EAy"])
+    # print("mass ", bn.Vdata["mass"])
+    # print("cog_x ", bn.Vdata["cog_x"])
+    # print("cog_z ", bn.Vdata["cog_z"])
 
-    # print "6 ------"
+    # print("6 ------")
     ######################################################
 
     # convert arrays to floats
     for vertex in bn.V:
         if not bn.Vdata[vertex]["parents"]:
-            bn.Vdata[vertex]["cprob"] = [x[0] / float(x[1]) for x in bn.Vdata[vertex]["cprob"]]
+            bn.Vdata[vertex]["cprob"] = [
+                x[0] / float(x[1]) for x in bn.Vdata[vertex]["cprob"]
+            ]
         else:
             for key in bn.Vdata[vertex]["cprob"].keys():
                 try:
-                    bn.Vdata[vertex]["cprob"][key] = [x[0] / float(x[1]) for x in bn.Vdata[vertex]["cprob"][key]]
+                    bn.Vdata[vertex]["cprob"][key] = [
+                        x[0] / float(x[1]) for x in bn.Vdata[vertex]["cprob"][key]
+                    ]
 
                 # default to even distribution if no data points
                 except ZeroDivisionError:
-
-                    bn.Vdata[vertex]["cprob"][key] = [1 / float(bn.Vdata[vertex]["numoutcomes"]) for x in bn.Vdata[vertex]["cprob"][key]]
+                    bn.Vdata[vertex]["cprob"][key] = [
+                        1 / float(bn.Vdata[vertex]["numoutcomes"])
+                        for x in bn.Vdata[vertex]["cprob"][key]
+                    ]
 
     # return cprob table with estimated probability distributions
     return bn
+
 
 def condprobve2(self, query, evidence):
     """
@@ -864,72 +917,75 @@ def condprobve2(self, query, evidence):
         result = fn.condprobve(query, evidence)
 
         # output
-        print json.dumps(result.vals, indent=2)
-        print json.dumps(result.scope, indent=2)
-        print json.dumps(result.card, indent=2)
-        print json.dumps(result.stride, indent=2)
+        print(json.dumps(result.vals, indent=2))
+        print(json.dumps(result.scope, indent=2))
+        print(json.dumps(result.card, indent=2))
+        print(json.dumps(result.stride, indent=2))
 
     """
-    assert (isinstance(query, dict) and isinstance(evidence, dict)), "First and second args must be dicts."
+    assert isinstance(query, dict) and isinstance(
+        evidence, dict
+    ), "First and second args must be dicts."
     # need to modify and add 1 to the zeros here but need frequency count
 
-    # print "factor list ", self.factorlist
-    # print "factor list0 len ", self.factorlist[0].vals
-    # print "factor list1 len ", self.factorlist[1].vals
-    # print "factor list2 len  ", self.factorlist[2].vals
-    # print "factor list3 len  ", self.factorlist[3].vals
-    # print "factor list4 len  ", self.factorlist[4].vals
-    # print "factor list5 len  ", self.factorlist[5].vals
+    # print("factor list ", self.factorlist)
+    # print("factor list0 len ", self.factorlist[0].vals)
+    # print("factor list1 len ", self.factorlist[1].vals)
+    # print("factor list2 len  ", self.factorlist[2].vals)
+    # print("factor list3 len  ", self.factorlist[3].vals)
+    # print("factor list4 len  ", self.factorlist[4].vals)
+    # print("factor list5 len  ", self.factorlist[5].vals)
 
     eliminate = self.bn.V[:]
 
-    # print "bn ", self.bn.V
+    # print("bn ", self.bn.V)
     for key in query.keys():
         eliminate.remove(key)
 
     for key in evidence.keys():
-        # print "key ", key
+        # print("key ", key)
         eliminate.remove(key)
 
-    # print "el bn ", eliminate
+    # print("el bn ", eliminate)
 
     # modify factors to account for E = e
     for key in evidence.keys():
-        # print "key ", key
+        # print("key ", key)
         for x in range(len(self.factorlist)):
             if self.factorlist[x].scope.count(key) > 0:
-                # print self.factorlist[x].scope.count(key)
+                # print(self.factorlist[x].scope.count(key))
                 self.factorlist[x].reducefactor(key, evidence[key])
-                # print self.factorlist[x].vals
+                # print(self.factorlist[x].vals)
 
         for x in reversed(range(len(self.factorlist))):
             if self.factorlist[x].scope == []:
                 del self.factorlist[x]
 
     # eliminate all necessary variables in the new factor set to produce result
-    # print "el bn ", eliminate
-    # print "factor list before elimination ", self.factorlist
+    # print("el bn ", eliminate)
+    # print("factor list before elimination ", self.factorlist)
     self.sumproductve(eliminate)
-    # print "el factor list", self.sumproductve(eliminate).factorlist
-    # print "factor list after elimination ", self.factorlist.vals
+    # print("el factor list", self.sumproductve(eliminate).factorlist)
+    # print("factor list after elimination ", self.factorlist.vals)
     # normalize result
     summ = 0.0
     lngth = len(self.factorlist.vals)
     for x in range(lngth):
         summ += self.factorlist.vals[x]
 
-    # print "summ ", summ
+    # print("summ ", summ)
 
     for x in range(lngth):
         a = float(self.factorlist.vals[x])
-        # print "a ", a
+        # print("a ", a)
         a = a / summ
 
     # return table
 
-    # print "self.stride ", self.stride
+    # print("self.stride ", self.stride)
 
     return self.factorlist
+
 
 """
 # TODO: extend predictquerieddistribution to handle multiple query nodes
@@ -948,6 +1004,7 @@ def predictquerieddistribution(queries, evidence, baynet):
 
     return posterior_distributions
 """
+
 
 # TODO: extend inferPosteriorDistribution to handle multiple query nodes
 def inferPosteriorDistribution(queries, evidence, baynet):
@@ -973,14 +1030,15 @@ def inferPosteriorDistribution(queries, evidence, baynet):
 
     # result = fn.condprobve(query, evidence)  # from library
     result = condprobve2(fn, queries, evidence)  # written here
-    print "result.vals ", result.vals
+    print("result.vals ", result.vals)
     probabilities = printdist(result, baynet)
 
     # make sure probabilities are listed in order of bins
     # for index, key in queries:
-    probabilities.sort_values(["max_def"], inplace = True)
+    probabilities.sort_values(["max_def"], inplace=True)
 
     return probabilities
+
 
 def laplacesmooth(bn):
     """
@@ -1001,8 +1059,8 @@ def laplacesmooth(bn):
     # lmeestimateparams
 
     for vertex in bn.V:
-        print "vertex ", vertex
-        # print bn.V[vertex]
+        print("vertex ", vertex)
+        # print(bn.V[vertex])
         numBins = bn.Vdata[vertex]["numoutcomes"]
 
         if not bn.Vdata[vertex]["parents"]:
@@ -1020,6 +1078,7 @@ def laplacesmooth(bn):
                     bincounts[j][1] += numBins  # denomenator (total count)
 
     return bn
+
 
 # need to modify buildBN to accept skel or skelfile
 def buildBN(trainingData, binstyleDict, numbinsDict, **kwargs):
@@ -1044,8 +1103,10 @@ def buildBN(trainingData, binstyleDict, numbinsDict, **kwargs):
     Bayesian network object
         Bayesian network learned from the training data.
     """
-    discretized_training_data, bin_ranges = discretizeTrainingData(trainingData, binstyleDict, numbinsDict, True)
-    print "discret training ", discretized_training_data
+    discretized_training_data, bin_ranges = discretizeTrainingData(
+        trainingData, binstyleDict, numbinsDict, True
+    )
+    print("discret training ", discretized_training_data)
 
     if "skel" in kwargs:
         # load file into skeleton
@@ -1060,9 +1121,12 @@ def buildBN(trainingData, binstyleDict, numbinsDict, **kwargs):
     learner = PGMLearner()
     # baynet = learner.discrete_mle_estimateparams(skel, discretized_training_data)
     # baynet = discrete_estimatebn(learner, discretized_training_data, skel, 0.05, 1)
-    baynet = discrete_mle_estimateparams2(skel, discretized_training_data)  # using discrete_mle_estimateparams2 written as function in this file, not calling from libpgm
+    baynet = discrete_mle_estimateparams2(
+        skel, discretized_training_data
+    )  # using discrete_mle_estimateparams2 written as function in this file, not calling from libpgm
 
     return baynet
+
 
 def expectedValue(binRanges, probabilities):
     """
@@ -1094,6 +1158,7 @@ def expectedValue(binRanges, probabilities):
         expectedV += meanBinvalue * probabilities[index]
 
     return expectedV
+
 
 def discretize(dataframe, binRangesDict, plot=False):
     """
@@ -1128,7 +1193,7 @@ def discretize(dataframe, binRangesDict, plot=False):
 
     # copy trainingDfDiscterizedRangesDict
     binCountsDict = copy.deepcopy(binRangesDict)
-    
+
     for key in binCountsDict:
         for bin in binCountsDict[key]:
             del bin[:]
@@ -1137,53 +1202,53 @@ def discretize(dataframe, binRangesDict, plot=False):
     for varName in binRangesDict.keys():
         # load discretized ranges belonging to varName in order to bin in
         discreteRanges = binRangesDict.get(varName)
-        # print discreteRanges
+        # print(discreteRanges)
         # binCounts = binCountsDict[varName]
 
         index = 0
         # for item1, item2 in trainingDf[varName], valBinnedDf[varName]:
         for item1 in dataframe[varName]:
-
             for i in range(len(discreteRanges)):
                 # bin training data
                 binRange = discreteRanges[i]
 
-                # print "bin range is ", binRange
-                # print "value to bin ", item1
+                # print("bin range is ", binRange)
+                # print("value to bin ", item1)
 
                 if i == 0:
                     # this is the first bin so bin numbers larger or equal
                     # than min num and less or equal than max num (basically,
                     # include min num)
                     if binRange[0] <= item1 <= binRange[1]:
-                        # print item1, " is binned within ", binRange
+                        # print(item1, " is binned within ", binRange)
                         binnedDf.iloc[index][varName] = i
                         binCountsDict[varName][i][0] += 1
                 else:
                     # this is not first bin so bin numbers less or equal to
                     # max num
                     if binRange[0] < item1 <= binRange[1]:
-                        # print item1, " is binned within ", binRange
+                        # print(item1, " is binned within ", binRange)
                         binnedDf.iloc[index][varName] = i
                         binCountsDict[varName][i][0] += 1
 
                 # catch values outside of range (smaller than min)
                 if i == 0 and binRange[0] > item1:
-                    # print "the value ", item1, "is smaller than the minimum bin", binRange[0]
+                    # print("the value ", item1, "is smaller than the minimum bin", binRange[0])
                     binnedDf.iloc[index][varName] = i
                     binCountsDict[varName][i][0] += 1
 
                 # catch values outside of range (larger than max)
                 if i == len(discreteRanges) - 1 and binRange[1] < item1:
-                    # print "the value ", item1, "is larger than the maximum bin", binRange[1]
+                    # print("the value ", item1, "is larger than the maximum bin", binRange[1])
                     binnedDf.iloc[index][varName] = i
                     binCountsDict[varName][i][0] += 1
 
             index += 1
 
-    binnedData = binnedDf.to_dict(orient="records") # a list of dictionaries
+    binnedData = binnedDf.to_dict(orient="records")  # a list of dictionaries
 
     return binnedData, binnedDf, binCountsDict
+
 
 """
 def getBinRangesAuto(dataFrame, targets):
@@ -1221,7 +1286,7 @@ def getBinRangesAuto(dataFrame, targets):
 
         DiscterizedRangesDict[target] = targetbinranges
 
-    for item in DiscterizedRangesDict: print item, " -- ", DiscterizedRangesDict[item]
+    for item in DiscterizedRangesDict: print(item, " -- ", DiscterizedRangesDict[item])
 
     return DiscterizedRangesDict
 
@@ -1252,6 +1317,8 @@ def mdlp(dataFrame, targets):
 
         DiscterizedRangesDict[varNames[variable]] = binranges
 """
+
+
 def getBinRanges(dataframe, binTypeDict, numBinsDict):
     """
     Function to generate bin ranges for all columns in a dataframe based on the
@@ -1281,7 +1348,7 @@ def getBinRanges(dataframe, binTypeDict, numBinsDict):
     # trainingDf = pd.DataFrame(self.unbinnedDF)
     # trainingDf.columns = trainingDf.iloc[0]
     # trainingDf = trainingDf[1:]
-    # print trainingDf
+    # print(trainingDf)
 
     trainingDfDiscterizedRanges = []
     trainingDfDiscterizedRangesDict = {}
@@ -1298,14 +1365,28 @@ def getBinRanges(dataframe, binTypeDict, numBinsDict):
         # if "e", discretise using equal bins
         if binTypeDict[varName] == "p":
             # add to list
-            trainingDfDiscterizedRanges.append(percentile_bins(dataframe[varName], numBinsDict.get(varName)))
+            trainingDfDiscterizedRanges.append(
+                percentile_bins(dataframe[varName], numBinsDict.get(varName))
+            )
             # add to dict
-            trainingDfDiscterizedRangesDict[varName] = percentile_bins(dataframe[varName], numBinsDict.get(varName))
+            trainingDfDiscterizedRangesDict[varName] = percentile_bins(
+                dataframe[varName], numBinsDict.get(varName)
+            )
         elif "e":
             # add to list
-            trainingDfDiscterizedRanges.append(bins(max(dataframe[varName]), min(dataframe[varName]), numBinsDict.get(varName)))
+            trainingDfDiscterizedRanges.append(
+                bins(
+                    max(dataframe[varName]),
+                    min(dataframe[varName]),
+                    numBinsDict.get(varName),
+                )
+            )
             # add to dict
-            trainingDfDiscterizedRangesDict[varName] = bins(max(dataframe[varName]), min(dataframe[varName]), numBinsDict.get(varName))
+            trainingDfDiscterizedRangesDict[varName] = bins(
+                max(dataframe[varName]),
+                min(dataframe[varName]),
+                numBinsDict.get(varName),
+            )
 
         # elif "a":
         #    trainingDfDiscterizedRangesDict[varName] =
@@ -1314,7 +1395,10 @@ def getBinRanges(dataframe, binTypeDict, numBinsDict):
 
     return trainingDfDiscterizedRangesDict
 
-def generateErrors(predictedTargetPosteriors, testingData, binnedTestingData, binRanges, target):
+
+def generateErrors(
+    predictedTargetPosteriors, testingData, binnedTestingData, binRanges, target
+):
     """
     Function to generate errors for predicted target posteriors based on
     testing data.
@@ -1347,34 +1431,43 @@ def generateErrors(predictedTargetPosteriors, testingData, binnedTestingData, bi
     posteriorPDmeans = []
 
     for posterior in predictedTargetPosteriors:
-
         posteriorPDmeans.append(expectedValue((binRanges[target]), posterior))
 
     mse = mean_squared_error(testingData[target], posteriorPDmeans)
     # mse = mean_squared_error(unbinnedTargetActual[targetList[0]], posteriorPDmeans)
     rmse = math.sqrt(mse)
 
-    # print "binnedTestingData[target] ", binnedTestingData[target]
-    # print "predictedTargetPosteiors ", predictedTargetPosteriors
+    # print("binnedTestingData[target] ", binnedTestingData[target])
+    # print("predictedTargetPosteiors ", predictedTargetPosteriors)
 
     loglossfunction = sklearn.metrics.log_loss(
         binnedTestingData[target],
         predictedTargetPosteriors,
         normalize=True,
-        labels=range(0, len(binRanges[target])))
+        labels=range(0, len(binRanges[target])),
+    )
 
     norm_distance_errors = distribution_distance_error(
         binnedTestingData[target],
         predictedTargetPosteriors,
         testingData[target],
         binRanges[target],
-        False)
+        False,
+    )
 
     correct_bin_probabilities = []
     for p in range(len(testingData[target])):
-        correct_bin_probabilities.append(predictedTargetPosteriors[p][binnedTestingData[target][p]])
+        correct_bin_probabilities.append(
+            predictedTargetPosteriors[p][binnedTestingData[target][p]]
+        )
 
-    return float(rmse), float(loglossfunction), norm_distance_errors, correct_bin_probabilities
+    return (
+        float(rmse),
+        float(loglossfunction),
+        norm_distance_errors,
+        correct_bin_probabilities,
+    )
+
 
 """
 # TODO: extend predictquerieddistribution to handle multiple query nodes
@@ -1395,6 +1488,7 @@ def predictquerieddistribution(queries, evidence, baynet):
 
     return posterior_distributions
 """
+
 
 def BNskelFromCSV(csvdata, targets):
     """
@@ -1449,7 +1543,6 @@ def BNskelFromCSV(csvdata, targets):
 
     if len(inputVerts) > len(targets):
         for target in targets:
-
             for input in inputVerts:
                 edge = [target, input]
                 edges.append(edge)
