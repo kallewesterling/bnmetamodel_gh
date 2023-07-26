@@ -52,7 +52,8 @@ class BN_Metamodel_easy:
         # extract skeleton from csv
         BNskel = BNskelFromCSV(csvdata, targets)
 
-        # if bool(BN_Metamodel_easy.numBinsDict) == False { } # if numBinsDict is empty
+        # if numBinsDict is empty:
+        # if bool(BN_Metamodel_easy.numBinsDict) == False { }
 
         # binTypeDict = {}
         # numBinsDict = {}

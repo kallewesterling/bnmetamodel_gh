@@ -1,10 +1,16 @@
+# requirement: sklearn
+from sklearn.model_selection import train_test_split
+
+# requirement: pandas
+import pandas as pd
+
+# requirement: numpy
+import numpy as np
+
 import csv
 import io
 import copy
-import pandas as pd
-import numpy as np
 import random
-from sklearn.model_selection import train_test_split
 import numbers
 
 def numericalSort(value):
@@ -98,11 +104,11 @@ def loadDataset_sk(filename, training_data=[], ver_data=[]):
     ver_data.insert(0, header)
 
     """
-    for i in range(1,len(training_data)):
+    for i in range(1, len(training_data)):
         for j in range(len(training_data[i])):
             float(training_data[i][j])
 
-    for i in range(1,len(ver_data)):
+    for i in range(1, len(ver_data)):
         for j in range(len(ver_data[i])):
             float(ver_data[i][j])
     """
@@ -143,7 +149,7 @@ def generate_training_ver_data(csv_file_path, num_ver_samples):
     ver_data = []
     training_data = copy.copy(data)
 
-    # rn = np.random.uniform(1,len(training_data),num_ver_samples)
+    # rn = np.random.uniform(1, len(training_data), num_ver_samples)
     # print rn [len(rn)-1]
     # print num_ver_samples
     # random_numbers =  []
@@ -388,7 +394,7 @@ def whichBin(values_list, ranges_list, indexOnly = False):
         `indexOnly`.
     """
     binned_list = []
-    bin_index_list = [0]*len(values_list)
+    bin_index_list = [0] * len(values_list)
 
     print "ranges ", ranges_list
 
@@ -397,6 +403,7 @@ def whichBin(values_list, ranges_list, indexOnly = False):
         binned = []
         for k in range(len(ranges_list)):
             binned.append(0.0)
+
         # print "--------------[ ", i, " ]---------------"
         # print "range ", ranges_list
         # print "value to bin", values_list[i]
@@ -408,11 +415,12 @@ def whichBin(values_list, ranges_list, indexOnly = False):
                 bin_index_list[i] = j
             # elif (j == len(ranges_list)-1) :
 
-
         binned_list.append(binned)
+
     # print "len of bin index list ", len(bin_index_list)
     # print "len of binned list ", len(binned_list)
     print "bin index list", bin_index_list
+
     if indexOnly == True :
         return bin_index_list
 
@@ -468,7 +476,6 @@ def disc2(csv_data, data, alldata, numBins, minmax):
     # extreme_ranges_dict  = ranges(cdata)
 
     extreme_ranges_dict = ranges_extreme(csv_data)
-
 
     # print "data", data
     binned_data = []
@@ -528,7 +535,7 @@ def disc2(csv_data, data, alldata, numBins, minmax):
 
             # kkk = str(csv_data[0][counter])
 
-            # print "kkk ",key, index, kkk
+            # print "kkk ", key, index, kkk
             # print "kkk ", kkk
             # print "max ", max
 
@@ -563,9 +570,11 @@ def disc2(csv_data, data, alldata, numBins, minmax):
             for k in range(0, len(bin_ranges)):
                 val_check = round(cdata[i][key], 6)
                 # print "val to be checked = ", val_check
+
                 bin_min = bin_ranges[k][0]
-                # print "bin min", bin_min
                 bin_max = bin_ranges[k][1]
+
+                # print "bin min", bin_min
                 # print "bin max", bin_max
 
                 # print "val", val_dict.values()[i]
@@ -583,12 +592,12 @@ def disc2(csv_data, data, alldata, numBins, minmax):
 
                     # print str(cdata[i].keys()[j])
                     # print "k = ", k
-                    # else: print "whooooooooops !"
+                # else: print "whooooooooops !"
 
-                    #               if ((cdata[i].values()[j] >= bin_min) and (cdata[i].values()[j] <= bin_max)) :
-                    #                   output_bins[str(cdata[i].keys()[j])] = k
-                    #                   print str(cdata[i].keys()[j])
-                    #                   print k
+                # if ((cdata[i].values()[j] >= bin_min) and (cdata[i].values()[j] <= bin_max)) :
+                #     output_bins[str(cdata[i].keys()[j])] = k
+                #     print str(cdata[i].keys()[j])
+                #     print k
 
         binned_data.append(output_bins)
 

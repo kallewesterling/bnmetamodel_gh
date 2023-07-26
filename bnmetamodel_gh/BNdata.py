@@ -1,8 +1,10 @@
-import csv
-import pandas as pd
-from Helper_functions import getBinRanges
-from Helper_functions import discretize
+from Helper_functions import getBinRanges, discretize
+
 import copy
+import csv
+
+# requirement: pandas
+import pandas as pd
 
 # TODO: implement MDRM Sensitivity analysis as class and then write a
 # "dimension reduction" wrapper function in BNdata - enables to reduce number
@@ -78,15 +80,21 @@ class BNdata:
 
         print "importing data from csv file completed"
 
+        ##################################################################
         # range discretization using equal or percentile binning
-        binRanges = getBinRanges(self.data,self.binTypeDict, self.numBinsDict) # returns dict with bin ranges
+        ##################################################################
+
+        # returns dict with bin ranges
+        binRanges = getBinRanges(self.data, self.binTypeDict, self.numBinsDict)
         self.binRanges = binRanges
+
+        ##################################################################
         # range discretization using minimum length description method
+        ##################################################################
         # binRanges = getBinRangesAuto(self.data, targetlist)
 
         # if "numBinsDict" in kwargs:
         #    self.numBinsDict = kwargs["numBinsDict"]
-
         # else:
         #    self.binRanges = binRanges
         #    self.numBinsDict = {}
@@ -95,7 +103,7 @@ class BNdata:
 
         print "binning data ..."
 
-        datadf, datadict, bincountsdict = discretize(self.data,self.binRanges,True)
+        datadf, datadict, bincountsdict = discretize(self.data, self.binRanges, True)
 
         print "binning data complete"
 
@@ -149,8 +157,8 @@ class BNdata:
                 trainingDfDiscterizedRanges.append(percentile_bins(self.data[varName], numBinsDict.get(varName)))  # adds to a list
                 trainingDfDiscterizedRangesDict[varName] = percentile_bins(self.data[varName], numBinsDict.get(varName))  # adds to a dictionary
             elif "equal":
-                trainingDfDiscterizedRanges.append(bins(max(self.data[varName]), min(self.data[varName]),numBinsDict.get(varName)))  # adds to a list
-                trainingDfDiscterizedRangesDict[varName] = bins(max(self.data[varName]), min(self.data[varName]),numBinsDict.get(varName))  # adds to a dictionary
+                trainingDfDiscterizedRanges.append(bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName)))  # adds to a list
+                trainingDfDiscterizedRangesDict[varName] = bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName))  # adds to a dictionary
 
         # update class attribute, while you're at it
         self.bin_ranges = trainingDfDiscterizedRangesDict
