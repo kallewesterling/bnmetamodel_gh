@@ -1,4 +1,4 @@
-from Helper_functions import getBinRanges, discretize
+from .Helper_functions import getBinRanges, discretize
 
 import csv
 
