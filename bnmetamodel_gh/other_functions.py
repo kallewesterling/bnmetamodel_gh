@@ -8,11 +8,41 @@ from sklearn.model_selection import train_test_split
 import numbers
 
 def numericalSort(value):
+    """
+    Splits the input string on numbers and sorts the parts numerically.
+
+    Parameters
+    ----------
+    value : str
+        Input string to be sorted.
+
+    Returns
+    -------
+    parts : list
+        The parts of the input string sorted numerically.
+    """
     parts = numbers.split(value)
     parts[1::2] = map(int, parts[1::2])
     return parts
 
 def loadDataset(filename, split, training_data=[], ver_data=[]):
+    """
+    Load a dataset from a CSV file and split it into training and verification
+    sets.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the CSV file containing the dataset.
+    split : float
+        Fraction of the data to be used for training.
+    training_data : list, optional
+        Existing list to which training data will be appended. Defaults to an
+        empty list.
+    ver_data : list, optional
+        Existing list to which verification data will be appended. Defaults to
+        an empty list.
+    """
     with open(filename, 'rb') as csvfile:
         lines = csv.reader(csvfile)
         dataset = list(lines)
@@ -31,7 +61,26 @@ def loadDataset(filename, split, training_data=[], ver_data=[]):
     print 'X_test)old', ver_data
 
 def loadDataset_sk(filename, training_data=[], ver_data=[]):
+    """
+    Load a dataset from a CSV file and split it into training and verification
+    sets using the ``sklearn`` library.
 
+    Parameters
+    ----------
+    filename : str
+        Path to the CSV file containing the dataset.
+    training_data : list, optional
+        Existing list to which training data will be appended. Defaults to an
+        empty list.
+    ver_data : list, optional
+        Existing list to which verification data will be appended. Defaults to
+        an empty list.
+
+    Returns
+    -------
+    tuple : tuple
+        Tuple containing training data and verification data.
+    """
     with open(filename, 'rb') as csvfile:
         lines = csv.reader(csvfile)
         dataset = list(lines)
@@ -43,7 +92,7 @@ def loadDataset_sk(filename, training_data=[], ver_data=[]):
     for i in range(1, len(dataset)):
         n_dataset.append([float(j) for j in dataset[i]])
 
-    training_data, ver_data = train_test_split(n_dataset, test_size=0.33, random_state=None)
+    training_data, ver_data = train_test_split(n_dataset, test_size=0.33, random_state = None)
 
     training_data.insert(0, header)
     ver_data.insert(0, header)
@@ -55,20 +104,36 @@ def loadDataset_sk(filename, training_data=[], ver_data=[]):
 
     for i in range(1,len(ver_data)):
         for j in range(len(ver_data[i])):
-            float(ver_data[i][j])        
+            float(ver_data[i][j])
     """
     print 'len Xtrain', len(training_data)
     print 'len X_test', len(ver_data)
     return training_data, ver_data
 
 def generate_training_ver_data(csv_file_path, num_ver_samples):
+    """
+    Generates training and verification data sets from a CSV file.
+
+    Parameters
+    ----------
+    csv_file_path : str
+        Path to the CSV file.
+    num_ver_samples : int
+        Number of samples to include in the verification set.
+
+    Returns
+    -------
+    tuple : tuple
+        Tuple containing training data and verification data.
+    """
+
     # READ CSV DATA
 
     # data_array = []
     data = []
 
     with io.open(csv_file_path, 'rb') as f:
-        reader = csv.reader(f, dialect=csv.excel)
+        reader = csv.reader(f, dialect = csv.excel)
 
         for row in reader:
             data.append(row)
@@ -104,6 +169,20 @@ def generate_training_ver_data(csv_file_path, num_ver_samples):
     return training_data, ver_data
 
 def list_to_libpgm_dict(list):
+    """
+    Convert a list to a dictionary compatible with libpgm.
+
+    Parameters
+    ----------
+    list : list
+        List to be converted to a dictionary.
+
+    Returns
+    -------
+    data_array : list
+        List of dictionaries where each dictionary corresponds to a list
+        element.
+    """
     # print 'l',list
     data_array = []
 
@@ -120,13 +199,26 @@ def list_to_libpgm_dict(list):
     return data_array
 
 def discretize(data, vars_to_discretize, n_bins):
-    '''
-    Accepts data, a dictionary containing dicretization type for selected variables, and
-    a dictionary containing the number of bins for selected variables.
-    Returns data after selected variables have been discretized,
-    together with binning definition for each variable.
-    '''
+    """
+    Discretize selected variables in the data.
 
+    Parameters
+    ----------
+    data : dict
+        Dictionary containing the dicretization type for selected variables.
+    vars_to_discretize : dict
+        Dictionary where keys are variable names to be discretized and values
+        are discretization types ('Equal', 'Freq', or 'Bins').
+    n_bins : dict
+        Dictionary where keys are variable names to be discretized and values
+        are the number of bins for each variable.
+
+    Returns
+    -------
+    tuple : tuple
+        Tuple where the first element is the discretized data and the second
+        element is a dictionary of bin definitions for each variable.
+    """
     data_subset = pd.DataFrame(data).copy()
     bins = {}
     for i in vars_to_discretize:
@@ -136,21 +228,21 @@ def discretize(data, vars_to_discretize, n_bins):
 
         # discretize by splitting into equal intervals
         if vars_to_discretize[i] == 'Equal':
-            out, binning = pd.cut(data_subset.ix[:, i], bins=n_bins[i], labels=False, retbins=True)
+            out, binning = pd.cut(data_subset.ix[:, i], bins = n_bins[i], labels = False, retbins = True)
 
         # discretize by frequency
         elif vars_to_discretize[i] == 'Freq':
             nb = n_bins[i]
             while True:
                 try:
-                    out, binning = pd.qcut(data_subset.ix[:, i], q=nb, labels=False, retbins=True)
+                    out, binning = pd.qcut(data_subset.ix[:, i], q = nb, labels = False, retbins = True)
                     break
                 except:
                     nb -= 1
 
         # discretize based on provided bin margins
         elif vars_to_discretize[i] == 'Bins':
-            out = np.digitize(data_subset.ix[:, i], n_bins[i], right=True) - 1
+            out = np.digitize(data_subset.ix[:, i], n_bins[i], right = True) - 1
             binning = n_bins[i]
 
         data_subset.ix[:, i] = out
@@ -163,6 +255,21 @@ def discretize(data, vars_to_discretize, n_bins):
     return data_subset, bins
 
 def ranges_extreme(csvData):
+    """
+    Compute the range (min and max) of each variable in the data.
+
+    Parameters
+    ----------
+    csvData : list
+        List of lists containing the data with each inner list representing a
+        variable.
+
+    Returns
+    -------
+    ranges : dict
+        Dictionary where keys are variable names and values are lists with two
+        elements [min, max].
+    """
     ranges = {}
 
     data = copy.deepcopy(csvData)
@@ -186,14 +293,36 @@ def ranges_extreme(csvData):
     return ranges
 
 def valstobins(csvData, val_dict, numBins):
-    # typical val_dict looks like this: {'A':0.1',
+    """
+    Convert values to bin indices based on the bin ranges computed from the
+    data.
+
+    Parameters
+    ----------
+    csvData : list
+        List of lists containing the data with each inner list representing a
+        variable.
+    val_dict : dict
+        Dictionary where keys are variable names and values are the values to
+        be converted to bin indices.
+    numBins : int
+        Number of bins.
+
+    Returns
+    -------
+    output_bins : dict
+        Dictionary where keys are variable names and values are the bin
+        indices.
+    """
+
+    # typical val_dict looks like this: {'A':0.1', ...}
     output_bins = {}
 
     #    e = {}
     #    for i in range (0, len(val_dict)):
     #        print 'eeee', extreme_ranges_dict[val_dict.keys()[i]]
     #        if (extreme_ranges_dict[val_dict.keys()[i]] != None):
-    #            e[val_dict.keys()[i]]=extreme_ranges_dict[val_dict.keys()[i]]
+    #            e[val_dict.keys()[i]] = extreme_ranges_dict[val_dict.keys()[i]]
 
     ##  extract ranges of bins from extreme ranges
     extreme_ranges_dict = ranges_extreme(csvData)
@@ -237,7 +366,27 @@ def valstobins(csvData, val_dict, numBins):
     return output_bins
 
 def whichBin (values_list, ranges_list, indexOnly = False):
+    """
+    Determine which bin each value in a list falls into based on a list of bin
+    ranges.
 
+    Parameters
+    ----------
+    values_list : list
+        List of values to be binned.
+    ranges_list : list
+        List of bin ranges.
+    indexOnly : bool, optional
+        If True, return only the bin indices. If False, return a list of lists
+        where each inner list is a binary list indicating the bin a value falls
+        into. Defaults to False.
+
+    Returns
+    -------
+    binned_list : list
+        List of bin indices or a list of binary lists depending on the value of
+        `indexOnly`.
+    """
     binned_list = []
     bin_index_list = [0]*len(values_list)
 
@@ -268,12 +417,49 @@ def whichBin (values_list, ranges_list, indexOnly = False):
     else: return binned_list
 
 def binstovals(bin_ranges):
+    """
+    This function seems to be incomplete. The purpose and parameters are
+    unknown due to lack of code body.
+
+    Parameters
+    ----------
+    bin_ranges : unknown
+        The purpose and type of this parameter is unknown due to lack of
+        function body.
+
+    Returns
+    -------
+    None
+    """
     # for i in range (0, bin_ranges):
 
     # print output_bins
     return
 
 def disc2(csv_data, data, alldata, numBins, minmax):
+    """
+    Discretizes the data based on ranges defined by extreme values, using
+    either percentile discretization or equal distance discretization.
+
+    Parameters
+    ----------
+    csv_data : list of dicts
+        Raw data input from a CSV file.
+    data : list of dicts
+        Data to be discretized.
+    alldata : list of dicts
+        Additional data used for determining ranges of discretization.
+    numBins : int
+        Number of bins to discretize the data into.
+    minmax : dict
+        Dictionary mapping keys in the data to a tuple of their min and max
+        values.
+
+    Returns
+    -------
+    list of dicts
+        Discretized data.
+    """
     assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
     cdata = copy.deepcopy(data)
 
@@ -305,7 +491,7 @@ def disc2(csv_data, data, alldata, numBins, minmax):
     for i in range(len(df.columns)):
         # store key name
         # all_key_strings.append(df.columns[i].astype(str))
-        #[[0.5901, 1.072859], [1.072859, 2.220474], [2.220474, 4.197012], [4.197012, 6.620893], [6.620893, 9.349943], [9.349943, 13.694827], [13.694827, 18.286964], [18.286964, 24.310064],
+        # [[0.5901, 1.072859], [1.072859, 2.220474], [2.220474, 4.197012], [4.197012, 6.620893], [6.620893, 9.349943], [9.349943, 13.694827], [13.694827, 18.286964], [18.286964, 24.310064],
         all_ranges.append(percentile_bins(alldf[alldf.columns[i]], numBins))
         if i ==0: output_ranges.append(percentile_bins(alldf[alldf.columns[i]], numBins))
 
@@ -404,6 +590,25 @@ def disc2(csv_data, data, alldata, numBins, minmax):
     return binned_data
 
 def disc3(csv_data, data, numBins):
+    """
+    Discretizes the data based on ranges defined by extreme values, with the
+    binned value being the midpoint of the bin.
+
+    Parameters
+    ----------
+    csv_data : list of dicts
+        Raw data input from a CSV file.
+    data : list of dicts
+        Data to be discretized.
+    numBins : int
+        Number of bins to discretize the data into.
+
+    Returns
+    -------
+    list of dicts
+        Discretized data with each value being the midpoint of the bin it
+        belongs to.
+    """
     assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
     cdata = copy.deepcopy(data)
 
@@ -463,6 +668,22 @@ def disc3(csv_data, data, numBins):
     return binned_data
 
 def disc(data, bins):
+    """
+    Discretizes the data based on ranges defined by the min and max values of
+    each feature.
+
+    Parameters
+    ----------
+    data : list of dicts
+        Data to be discretized.
+    bins : int
+        Number of bins to discretize the data into.
+
+    Returns
+    -------
+    list of dicts
+        Discretized data.
+    """
     assert (isinstance(data, list) and data and isinstance(data[0], dict)), "Arg must be a list of dicts."
     cdata = copy.deepcopy(data)
     # cdata = data
@@ -513,4 +734,3 @@ def disc(data, bins):
     # print 'cdata', cdata
     # print 'binscount', bincounts
     return cdata
-

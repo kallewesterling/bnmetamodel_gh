@@ -7,9 +7,34 @@ import copy
 #TODO: implement MDRM Sensitivity analysis as class and then write a 'dimension reduction' wrapper function in BNdata - enables to reduce number of BN input variables
 
 class BNdata:
+    """
+    The BNdata class is designed for reading, storing and binning data for
+    Bayesian Network analysis. This class can take a CSV file or a list of
+    lists as input, perform binning based on  user-defined parameters, and
+    store binned data and related details for further analysis.
+    """
 
-    def __init__(self, csvdata, targetlist, binTypeDict, numBinsDict ): # data can either be specified by file path or by list
-    #def __init__(self, csvdata, targetlist, **kwargs):  # data can either be specified by file path or by list
+    def __init__(self, csvdata, targetlist, binTypeDict, numBinsDict ):
+    #def __init__(self, csvdata, targetlist, **kwargs):
+        """
+        Initializes the BNdata class.
+
+        Parameters
+        ----------
+        csvdata : str or list of lists
+            Data to be used, provided either as a file path to a CSV file, or
+            a list of lists where each list represents a row of data.
+        targetlist : list
+            List of target variable names. These variables are of interest in
+            the Bayesian Network analysis.
+        binTypeDict : dict
+            A dictionary mapping variable names to binning types (e.g.,
+            ``'equal'``, ``'percentile'``).
+        numBinsDict : dict
+            A dictionary mapping variable names to the number of bins to use
+            for that variable.
+        """
+
 
         #if 'binTypeDict' in kwargs:
         #    self.binTypeDict = kwargs['binTypeDict']
