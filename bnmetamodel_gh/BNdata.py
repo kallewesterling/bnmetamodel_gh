@@ -212,6 +212,6 @@ class BNdata:
 
         print 'train binCountdict ', binCountsDict
         print 'binned_trainingData ', binnedData
-        return binnedData
 
+        return binnedData
     """
