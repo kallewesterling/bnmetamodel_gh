@@ -4,7 +4,9 @@ from Helper_functions import getBinRanges
 from Helper_functions import discretize
 import copy
 
-#TODO: implement MDRM Sensitivity analysis as class and then write a 'dimension reduction' wrapper function in BNdata - enables to reduce number of BN input variables
+# TODO: implement MDRM Sensitivity analysis as class and then write a
+# 'dimension reduction' wrapper function in BNdata - enables to reduce number
+# of BN input variables.
 
 class BNdata:
     """
@@ -15,7 +17,7 @@ class BNdata:
     """
 
     def __init__(self, csvdata, targetlist, binTypeDict, numBinsDict ):
-    #def __init__(self, csvdata, targetlist, **kwargs):
+    # def __init__(self, csvdata, targetlist, **kwargs):
         """
         Initializes the BNdata class.
 
@@ -35,8 +37,7 @@ class BNdata:
             for that variable.
         """
 
-
-        #if 'binTypeDict' in kwargs:
+        # if 'binTypeDict' in kwargs:
         #    self.binTypeDict = kwargs['binTypeDict']
 
         self.targets = targetlist
@@ -45,9 +46,8 @@ class BNdata:
 
         print 'importing data from csv file ...'
 
-        # if data is a filepath
         if isinstance(csvdata, basestring):
-
+            # data is a filepath
             dataset = []
             with open(csvdata, 'rb') as csvfile:
                 lines = csv.reader(csvfile)
@@ -56,7 +56,7 @@ class BNdata:
                     dataset.append(row)
 
             csvD = []
-            #csvD.append(dataset[0])
+            # csvD.append(dataset[0])
             for i in range(0, len(dataset)):
                 row = []
                 for j in range(0, len(dataset[i])):
@@ -70,29 +70,24 @@ class BNdata:
 
             self.dataArray = csvD
             self.data = pd.DataFrame(data=csvD[1:], columns=csvD[0])
-
-
-        # else, if data is a list of lists
         elif isinstance (csvdata, list):
-
+            # data is a list of lists
             self.data = pd.DataFrame(csvdata, header=0)
 
             self.dataArray = csvdata
+
         print 'importing data from csv file completed'
 
-        ## range discretization using equal or percentile binning
-        binRanges = getBinRanges(self.data,self.binTypeDict, self.numBinsDict) #returns dict with bin ranges
+        # range discretization using equal or percentile binning
+        binRanges = getBinRanges(self.data,self.binTypeDict, self.numBinsDict) # returns dict with bin ranges
         self.binRanges = binRanges
-        ## range discretization using minimum length description method
-        #binRanges = getBinRangesAuto(self.data, targetlist)
+        # range discretization using minimum length description method
+        # binRanges = getBinRangesAuto(self.data, targetlist)
 
-
-
-        #if 'numBinsDict' in kwargs:
+        # if 'numBinsDict' in kwargs:
         #    self.numBinsDict = kwargs['numBinsDict']
 
-
-        #else:
+        # else:
         #    self.binRanges = binRanges
         #    self.numBinsDict = {}
         #    for var in binRanges:
@@ -106,16 +101,10 @@ class BNdata:
 
         self.binnedDict, self.binnedData, self.bincountsDict = datadf, datadict, bincountsdict
 
-
-
-    #def SA (self):
-
-
-
     """
-    
     def loadFromCSV (self, header=False):
-        # TODO: should rewrite this function as loaddataset_kfold and write the kfold code in here and return list of lists of indexes
+        # TODO: should rewrite this function as loaddataset_kfold and write
+        # the kfold code in here and return list of lists of indexes
         dataset = []
         with open(self.file, 'rb') as csvfile:
             lines = csv.reader(csvfile)
@@ -138,15 +127,16 @@ class BNdata:
 
         return data
 
+
     def getBinRanges (self, binTypeDict, numBinsDict):
 
         # percentileBoolDict should be in the form of {max_def: False, moment_inertia: True, ...}
         # numBinDict should be in the form of {max_def: 10, moment_inertia: 5, ...}
 
-        #trainingDf = pd.DataFrame(self.data)
-        #trainingDf.columns = trainingDf.iloc[0]
-        #trainingDf = trainingDf[1:]
-        #print trainingDf
+        # trainingDf = pd.DataFrame(self.data)
+        # trainingDf.columns = trainingDf.iloc[0]
+        # trainingDf = trainingDf[1:]
+        # print trainingDf
 
         trainingDfDiscterizedRanges = []
         trainingDfDiscterizedRangesDict = {}
@@ -167,15 +157,16 @@ class BNdata:
 
         return trainingDfDiscterizedRangesDict
 
+
     def discretize (self, binRangesDict, plot=False):
 
         # percentileBoolDict should be in the form of {max_def: False, moment_inertia: True, ...}
         # numBinDict should be in the form of {max_def: 10, moment_inertia: 5, ...}
 
-        #df = pd.DataFrame(data)
-        #df.columns = df.iloc[0]
-        #df = df [1:]
-        #print df
+        # df = pd.DataFrame(data)
+        # df.columns = df.iloc[0]
+        # df = df [1:]
+        # print df
 
         binnedDf = pd.DataFrame().reindex_like(self.data)
 
@@ -224,6 +215,3 @@ class BNdata:
         return binnedData
 
     """
-
-
-

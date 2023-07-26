@@ -36,9 +36,9 @@ class BN_Metamodel_easy:
             are:
 
             - 'numBinsDict': dict, optional
-                A dictionary mapping variables to the number of bins to be used in
-                the BN for each variable. If not provided, the default setting is
-                7 bins for each variable.
+                A dictionary mapping variables to the number of bins to be
+                used in the BN for each variable. If not provided, the default
+                setting is 7 bins for each variable.
         """
         self.targets = targets
 
@@ -61,7 +61,6 @@ class BN_Metamodel_easy:
             self.numBinsDict = kwargs["numBinsDict"]
 
         # if 'binTypeDict' in kwargs:
-        # """
         for var in self.variables:
             if var in targets:
                 # default: all distributions are discretized by equal spacing
@@ -75,7 +74,7 @@ class BN_Metamodel_easy:
 
                 # default: all distributions have 6 bins by default
                 self.numBinsDict[var] = 7
-        # """
+
         # data = BNdata(csvdata, self.binTypeDict, self.numBinsDict)
         data = BNdata(
             csvdata=csvdata,

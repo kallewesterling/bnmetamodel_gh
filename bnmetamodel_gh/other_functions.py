@@ -324,7 +324,7 @@ def valstobins(csvData, val_dict, numBins):
     #        if (extreme_ranges_dict[val_dict.keys()[i]] != None):
     #            e[val_dict.keys()[i]] = extreme_ranges_dict[val_dict.keys()[i]]
 
-    ##  extract ranges of bins from extreme ranges
+    # extract ranges of bins from extreme ranges
     extreme_ranges_dict = ranges_extreme(csvData)
     # extreme_ranges_dict  = ranges(data)
     extreme_ranges = list(extreme_ranges_dict)
@@ -393,28 +393,30 @@ def whichBin (values_list, ranges_list, indexOnly = False):
     print 'ranges ', ranges_list
 
     for i in range (len(values_list)):
-        #print 'value to bin ', values_list[i]
+        # print 'value to bin ', values_list[i]
         binned = []
         for k in range (len(ranges_list)):
             binned.append(0.0)
-        #print '--------------[ ',i,' ]---------------'
-        #print 'range ', ranges_list
-        #print 'value to bin', values_list[i]
+        # print '--------------[ ',i,' ]---------------'
+        # print 'range ', ranges_list
+        # print 'value to bin', values_list[i]
 
         for j in range (len(ranges_list)):
             if ((values_list[i] >= ranges_list[j][0]) & (values_list[i] <= ranges_list[j][1])):
                 binned[j] = 1.0
-                #print 'bin found ', j
+                # print 'bin found ', j
                 bin_index_list[i] = j
-            #elif (j== len(ranges_list)-1) :
+            # elif (j== len(ranges_list)-1) :
 
 
         binned_list.append(binned)
-    #print 'len of bin index list ', len(bin_index_list)
-    #print 'len of binned list ', len(binned_list)
+    # print 'len of bin index list ', len(bin_index_list)
+    # print 'len of binned list ', len(binned_list)
     print 'bin index list', bin_index_list
-    if indexOnly == True : return bin_index_list
-    else: return binned_list
+    if indexOnly == True :
+        return bin_index_list
+
+    return binned_list
 
 def binstovals(bin_ranges):
     """
@@ -486,14 +488,21 @@ def disc2(csv_data, data, alldata, numBins, minmax):
     output_ranges = []
     all_key_strings = df.columns.get_values()
     all_key_strings = all_key_strings.tolist()
-    #print all_key_strings
+    # print all_key_strings
 
     for i in range(len(df.columns)):
         # store key name
         # all_key_strings.append(df.columns[i].astype(str))
-        # [[0.5901, 1.072859], [1.072859, 2.220474], [2.220474, 4.197012], [4.197012, 6.620893], [6.620893, 9.349943], [9.349943, 13.694827], [13.694827, 18.286964], [18.286964, 24.310064],
+        # [
+        #   [0.5901, 1.072859], [1.072859, 2.220474], [2.220474, 4.197012],
+        #   [4.197012, 6.620893], [6.620893, 9.349943], [9.349943, 13.694827],
+        #   [13.694827, 18.286964], [18.286964, 24.310064],
+        #   ...
+        # ]
         all_ranges.append(percentile_bins(alldf[alldf.columns[i]], numBins))
-        if i ==0: output_ranges.append(percentile_bins(alldf[alldf.columns[i]], numBins))
+
+        if i == 0:
+            output_ranges.append(percentile_bins(alldf[alldf.columns[i]], numBins))
 
         # print list (col)
     print 'all ranges ', all_ranges
@@ -501,17 +510,17 @@ def disc2(csv_data, data, alldata, numBins, minmax):
     # print len(cdata)
     for i in range(0, len(cdata)):
         output_bins = {}
-        ##print 'length of------------------------------', i, 'is', len(cdata[i])
+        # print 'length of ---------------------------', i, 'is', len(cdata[i])
         counter = 0
         for key in cdata[i].keys():
             # for j in range (0, len(cdata[i])):
             # print 'j iter is', j
             # print 'cdata key ', key
             min = minmax [key][0]
-            #min = extreme_ranges_dict[key][0]
+            # min = extreme_ranges_dict[key][0]
             # print 'min ', min
             max = minmax [key][1]
-            #max = extreme_ranges_dict[key][1]
+            # max = extreme_ranges_dict[key][1]
 
             index = all_key_strings.index(key)
 
@@ -524,60 +533,55 @@ def disc2(csv_data, data, alldata, numBins, minmax):
             # min = float(extreme_ranges_dict[cdata[i].keys()[j]][0])
             # max = float(extreme_ranges_dict[cdata[i].keys()[j]][1])
             # print 'counter = ', counter
-            # TODO change hard coded max_def to output via constructor
+            # TODO: change hard coded max_def to output via constructor
             if key == 'max_def':
-                ### using percentile discretisation ###
-                #bin_ranges = all_ranges[index]
-                #bin_ranges = output_ranges[index]
+                # using percentile discretisation
+                # bin_ranges = all_ranges[index]
+                # bin_ranges = output_ranges[index]
 
-                ### using equal distance discretisation ###
+                # using equal distance discretisation
                 bin_ranges = bins(max, min, numBins)
-                #print 'bin ranges disc2 ', bin_ranges
+                # print 'bin ranges disc2 ', bin_ranges
             else:
-                ### using percentile discretisation ###
+                # using percentile discretisation
                 bin_ranges = all_ranges[index]
 
-                ### using equal distance discretisation ###
-                #bin_ranges = bins(max, min, numBins)
-
+                # using equal distance discretisation
+                # bin_ranges = bins(max, min, numBins)
 
                 # print 'not max_def'
 
                 # print 'old bin ranges ', bin_ranges
-            #
+
             # bin_ranges = all_ranges[index]
             # print ' new bin ranges ', bin_ranges
 
             counter = counter + 1
 
             for k in range(0, len(bin_ranges)):
-
                 val_check = round(cdata[i][key], 6)
-                #print 'val to be checked = ', val_check
+                # print 'val to be checked = ', val_check
                 bin_min = bin_ranges[k][0]
-                ##print 'bin min' ,bin_min
+                # print 'bin min' ,bin_min
                 bin_max = bin_ranges[k][1]
-                ##print 'bin max', bin_max
-
+                # print 'bin max', bin_max
 
                 # print 'val', val_dict.values()[i]
                 if ((val_check >= bin_min) and (val_check <= bin_max)):
-                    #print 'key', key
-                    #if (output_bins[str(key)] != None):
+                    # print 'key', key
+                    # if (output_bins[str(key)] != None):
                     if key not in output_bins:
                         output_bins[str(key)] = k
 
-                if (k==0) and (val_check<bin_min):
-
+                if (k == 0) and (val_check<bin_min):
                         output_bins[str(key)] = k
 
-                #if (k == len(bin_ranges)-1) and (val_check > bin_max):
-                    #output_bins[str(key)] = k
-
+                # if (k == len(bin_ranges)-1) and (val_check > bin_max):
+                    # output_bins[str(key)] = k
 
                     # print str(cdata[i].keys()[j])
-                    ##print 'k = ', k
-                    ##else: print 'whooooooooops !'
+                    # print 'k = ', k
+                    # else: print 'whooooooooops !'
 
                     #               if ((cdata[i].values()[j] >= bin_min) and (cdata[i].values()[j] <= bin_max)) :
                     #                   output_bins[str(cdata[i].keys()[j])] = k
@@ -623,12 +627,12 @@ def disc3(csv_data, data, numBins):
     # print len(cdata)
     for i in range(0, len(cdata)):
         output_bins = {}
-        ##print 'length of------------------------------', i, 'is', len(cdata[i])
+        # print 'length of---------------------------', i, 'is', len(cdata[i])
 
         for key in cdata[i].keys():
             # for j in range (0, len(cdata[i])):
             # print 'j iter is', j
-            ##print 'cdata', key
+            # print 'cdata', key
 
             min = extreme_ranges_dict[key][0]
             # print min
@@ -642,21 +646,19 @@ def disc3(csv_data, data, numBins):
             # print key, bin_ranges
 
             for k in range(0, len(bin_ranges)):
-
                 val_check = round(cdata[i][key], 6)
-                ##print 'val to be checked = ', val_check
+                # print 'val to be checked = ', val_check
                 bin_min = bin_ranges[k][0]
-                ##print 'bin min' ,bin_min
+                # print 'bin min' ,bin_min
                 bin_max = bin_ranges[k][1]
-                ##print 'bin max', bin_max
-
+                # print 'bin max', bin_max
 
                 # print 'val', val_dict.values()[i]
                 if ((val_check >= bin_min) and (val_check <= bin_max)):
                     output_bins[str(key)] = ((bin_max - bin_min) / 2) + bin_min
                     # print str(cdata[i].keys()[j])
-                    ##print 'k = ', k
-                    ##else: print 'whooooooooops !'
+                    # print 'k = ', k
+                    # else: print 'whooooooooops !'
 
                     #               if ((cdata[i].values()[j] >= bin_min) and (cdata[i].values()[j] <= bin_max)) :
                     #                   output_bins[str(cdata[i].keys()[j])] = k
@@ -664,6 +666,7 @@ def disc3(csv_data, data, numBins):
                     #                   print k
 
         binned_data.append(output_bins)
+
     # print binned_data
     return binned_data
 
