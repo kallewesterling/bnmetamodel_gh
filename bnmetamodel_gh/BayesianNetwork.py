@@ -100,7 +100,10 @@ class BayesianNetwork:
             # learner = PGMLearner()
             # baynet = learner.discrete_mle_estimateparams(skel, discretized_training_data)
             # baynet = discrete_estimatebn(learner, discretized_training_data, skel, 0.05, 1)
-            baynet = discrete_mle_estimateparams2(self.skel, BNdata.binnedDict)  # using discrete_mle_estimateparams2 written as function in this file, not calling from libpgm
+
+            # using discrete_mle_estimateparams2 written as function in this file, not calling from libpgm
+            baynet = discrete_mle_estimateparams2(self.skel, BNdata.binnedDict)
+
             # TODO: baynet might be redundant since we are building a junction tree.
 
             print "this is what the libpgm algorithm spits out all data ", self.skel.alldata
@@ -282,9 +285,15 @@ class BayesianNetwork:
             state (post inference probability distributions).
         """
 
-        # evidence is provided in the form of a dict { "x1": [0.2, 0.1, 0.4, 0.0, 0.3], "x2": [1.0, 0.0, 0.0, 0.0, 0.0], ...}
+        # evidence is provided in the form of a dict:
+        # {
+        #     "x1": [0.2, 0.1, 0.4, 0.0, 0.3],
+        #     "x2": [1.0, 0.0, 0.0, 0.0, 0.0],
+        #     ...
+        # }
 
-        for varName in evidence.keys(): # for each evidence variable
+        for varName in evidence.keys():
+            # loop through each evidence variable
             var = varName
             num_states = len(evidence[var])
 
@@ -318,7 +327,7 @@ class BayesianNetwork:
                         queriedMarginalPosteriors.append(marginalPosterior)
                 else:
                     marginalPosterior = printdist(result, self.learnedBaynet)
-                    marginalPosterior.sort_values([query.keys()[0]], inplace = True)
+                    marginalPosterior.sort_values([query.keys()[0]], inplace=True)
                     # to make sure probabilities are listed in order of bins,
                     # sorted by first queried variable
                     queriedMarginalPosteriors.append(marginalPosterior)
