@@ -54,9 +54,9 @@ class BayesianNetwork:
             self.json_data = modeldata
             # self.learnedBaynet = DiscreteBayesianNetwork(modeldata)
             self.learnedBaynet = DiscreteBayesianNetwork()
-            self.nodes = modeldata['V']
-            self.edges = modeldata ['E']
-            self.Vdata = modeldata ['Vdata']
+            self.nodes = modeldata["V"]
+            self.edges = modeldata ["E"]
+            self.Vdata = modeldata ["Vdata"]
 
             self.targets = targetlist
             # self.numBinsDict = numBinsDict
@@ -85,33 +85,33 @@ class BayesianNetwork:
                 self.skel = self.structure
 
             # learn bayesian network
-            print 'building bayesian network ...'
+            print "building bayesian network ..."
             # learner = PGMLearner()
             # baynet = learner.discrete_mle_estimateparams(skel, discretized_training_data)
             # baynet = discrete_estimatebn(learner, discretized_training_data, skel, 0.05, 1)
             baynet = discrete_mle_estimateparams2(self.skel, BNdata.binnedDict)  # using discrete_mle_estimateparams2 written as function in this file, not calling from libpgm
             # TODO: baynet might be redundant since we are building a junction tree.
 
-            print 'this is what the libpgm algorithm spits out all data ', self.skel.alldata
+            print "this is what the libpgm algorithm spits out all data ", self.skel.alldata
 
             self.learnedBaynet = baynet
             self.nodes = baynet.V
             self.edges = baynet.E
             self.Vdata = baynet.Vdata
-            self.json_data = {'V': self.nodes, 'E': self.edges, 'Vdata': self.Vdata}
+            self.json_data = {"V": self.nodes, "E": self.edges, "Vdata": self.Vdata}
 
             # self.numBinsDict = self.BNdata.numBinsDict
             self.BinRanges = self.BNdata.binRanges
 
-            print 'building bayesian network complete'
+            print "building bayesian network complete"
 
 
-        print 'json data ', self.json_data
+        print "json data ", self.json_data
 
         # create BN with pybbn
         bbn = Factory.from_libpgm_discrete_dictionary(self.json_data)
 
-        print 'building junction tree ...'
+        print "building junction tree ..."
         # create join tree (this must be computed once)
         self.join_tree = InferenceController.apply(bbn)
         print "building junction tree is complete"
@@ -144,7 +144,7 @@ class BayesianNetwork:
         return baynet
 
 
-    def getpriors (self):
+    def getpriors(self):
         """
         Retrieves the prior probabilities of the variables in the Bayesian
         network.
@@ -195,15 +195,15 @@ class BayesianNetwork:
             A dictionary mapping variable names to their inferred posterior
             probabilities.
         """
-        print 'performing inference ...'
-        print 'building conditional probability table ...'
+        print "performing inference ..."
+        print "building conditional probability table ..."
 
         fn = TableCPDFactorization(self.learnedBaynet)
-        print 'conditional probability table is completed'
-        print 'performing inference with specified hard evidence ...'
+        print "conditional probability table is completed"
+        print "performing inference with specified hard evidence ..."
         result = condprobve2(fn, query, evidence)
 
-        print 'result ofrom condprobve2 ', result
+        print "result ofrom condprobve2 ", result
         # result = fn.condprobve(query, evidence)
 
         queriedMarginalPosteriors = []
@@ -212,14 +212,14 @@ class BayesianNetwork:
         if len(query) > 1:
 
             probabilities = printdist(result, self.learnedBaynet)
-            print 'probabilities from printdist2 ', probabilities
+            print "probabilities from printdist2 ", probabilities
 
             for varName in query.keys():
 
-                marginalPosterior = probabilities.groupby(varName,as_index = False)['probability'].sum()
+                marginalPosterior = probabilities.groupby(varName,as_index = False)["probability"].sum()
                 marginalPosterior.sort_values([varName], inplace = True)
                 queriedMarginalPosteriors.append(marginalPosterior)
-                postInferencePDs[varName] = marginalPosterior['probability'].tolist()
+                postInferencePDs[varName] = marginalPosterior["probability"].tolist()
 
         else:
             marginalPosterior = printdist(result, self.learnedBaynet)
@@ -228,22 +228,22 @@ class BayesianNetwork:
             # to make sure probabilities are listed in order of bins, sorted by
             # first queried variable
             queriedMarginalPosteriors.append(marginalPosterior)
-            postInferencePDs[query.keys()[0]] = marginalPosterior['probability'].tolist()
+            postInferencePDs[query.keys()[0]] = marginalPosterior["probability"].tolist()
 
-        # print 'evidence keys ', evidence.keys()
+        # print "evidence keys ", evidence.keys()
         for varName in evidence.keys():
             e = []
-            for i in range (0, len(self.BNdata.binRanges[varName])):
+            for i in range(0, len(self.BNdata.binRanges[varName])):
                 e.append(0.0)
 
-            # print ' evidenceMarginalPriors[varName] ', evidenceMarginalPriors[varName]
+            # print " evidenceMarginalPriors[varName] ", evidenceMarginalPriors[varName]
 
             e[evidence[varName]] = 1.0
             postInferencePDs[varName] = e
 
-        # print 'priors ', postInferencePDs
+        # print "priors ", postInferencePDs
 
-        print 'inference is complete'
+        print "inference is complete"
         return queriedMarginalPosteriors, postInferencePDs
 
 
@@ -273,7 +273,7 @@ class BayesianNetwork:
             state (post inference probability distributions).
         """
 
-        # evidence is provided in the form of a dict { 'x1': [0.2, 0.1, 0.4, 0.0, 0.3], 'x2': [1.0, 0.0, 0.0, 0.0, 0.0], ...}
+        # evidence is provided in the form of a dict { "x1": [0.2, 0.1, 0.4, 0.0, 0.3], "x2": [1.0, 0.0, 0.0, 0.0, 0.0], ...}
 
         for varName in evidence.keys(): # for each evidence variable
 
@@ -283,17 +283,17 @@ class BayesianNetwork:
 
             num_states = len(evidence[var])
 
-            for i in range (0, num_states): # for each state
+            for i in range(0, num_states): # for each state
                 e = {var:i}
 
-                print 'performing inference ...'
-                print 'building conditional probability table ...'
+                print "performing inference ..."
+                print "building conditional probability table ..."
 
                 # query is list of variables that are being queried
                 fn = TableCPDFactorization(self.learnedBaynet)
 
-                print 'conditional probability table is completed'
-                print 'performing inference with specified soft evidence ...'
+                print "conditional probability table is completed"
+                print "performing inference with specified soft evidence ..."
 
                 result = condprobve2(fn, query, e)
 
@@ -305,7 +305,7 @@ class BayesianNetwork:
 
 
                     for varName in query.keys():
-                        marginalPosterior = probabilities.groupby(varName, as_index = False)['probability'].sum()
+                        marginalPosterior = probabilities.groupby(varName, as_index = False)["probability"].sum()
                         marginalPosterior.sort_values([varName], inplace = True)
                         
                         # returns a list of dataframes, each with probability
@@ -318,7 +318,7 @@ class BayesianNetwork:
                     # sorted by first queried variable
                     queriedMarginalPosteriors.append(marginalPosterior)
 
-                # print 'queried marginal posteriors ' ,queriedMarginalPosteriors
+                # print "queried marginal posteriors ", queriedMarginalPosteriors
 
                 allStatesQueriedMarginalPosteriors.append(queriedMarginalPosteriors)
         # loop through each state
@@ -328,37 +328,37 @@ class BayesianNetwork:
         # dummy list of queried PD dicts
         assembledP = allStatesQueriedMarginalPosteriors[0]
 
-        # for index, state in enumerate (allStatesQueriedMarginalPosteriors):
+        # for index, state in enumerate(allStatesQueriedMarginalPosteriors):
 
         for varName in evidence.keys():  # for each evidence variable
             evidencePD = evidence[varName]
             postInferencePDs = {}
             assembledPosterior = []
 
-            for i, queryVarName in enumerate (query.keys()):
-                # print 'query varname ', queryVarName
+            for i, queryVarName in enumerate(query.keys()):
+                # print "query varname ", queryVarName
 
                 # num_states= len(self.BNdata.binRanges[queryVarName])
-                num_states = len(allStatesQueriedMarginalPosteriors[0][i]['probability'].tolist())
+                num_states = len(allStatesQueriedMarginalPosteriors[0][i]["probability"].tolist())
                 print
 
-                for j in range (0, num_states):
+                for j in range(0, num_states):
 
                     sum = 0
-                    for k in range  (0,len(evidencePD)):
+                    for k in range(0,len(evidencePD)):
                     # for k, state in enumerate(allStatesQueriedMarginalPosteriors):
 
-                        # print allStatesQueriedMarginalPosteriors[k][i]['probability'].tolist()[j]
-                        # print 'evidence ', evidencePD[k]
+                        # print allStatesQueriedMarginalPosteriors[k][i]["probability"].tolist()[j]
+                        # print "evidence ", evidencePD[k]
 
-                        sum+= allStatesQueriedMarginalPosteriors[k][i]['probability'].tolist()[j]* evidencePD[k]
+                        sum+= allStatesQueriedMarginalPosteriors[k][i]["probability"].tolist()[j]* evidencePD[k]
 
-                    assembledP[i].set_value(j, 'probability', sum) # data frame
+                    assembledP[i].set_value(j, "probability", sum) # data frame
                     assembledPosterior.append(sum) # list
 
                 assembledPosteriors.append(assembledPosterior)
-                postInferencePDs.update({queryVarName: assembledP[i]['probability'].tolist()})
-                # postInferencePDs[queryVarName] = assembledP[i]['probability'].tolist() # for visualising PDs
+                postInferencePDs.update({queryVarName: assembledP[i]["probability"].tolist()})
+                # postInferencePDs[queryVarName] = assembledP[i]["probability"].tolist() # for visualising PDs
 
         # TODO: here need to update BN PDS and set them as priors for infernece with the next evidence variable
 
@@ -367,7 +367,7 @@ class BayesianNetwork:
 
             postInferencePDs[evidenceVarName] = evidence[evidenceVarName]
 
-        print 'inference is complete'
+        print "inference is complete"
         return assembledP, postInferencePDs
 
     def inferPD_3(self, query, evidence, plot=False):
@@ -398,7 +398,7 @@ class BayesianNetwork:
             state (post inference probability distributions).
         """
 
-        # evidence is provided in the form of a dict { 'x1': [0.2, 0.1, 0.4, 0.0, 0.3], 'x2': [1.0, 0.0, 0.0, 0.0, 0.0], ...}
+        # evidence is provided in the form of a dict { "x1": [0.2, 0.1, 0.4, 0.0, 0.3], "x2": [1.0, 0.0, 0.0, 0.0, 0.0], ...}
 
         ##############################################################
         # GENERATE SEQUENCE DICTIONARY : ALL POSSIBLE COMBINATIONS OF
@@ -408,7 +408,7 @@ class BayesianNetwork:
         allstates = []
         for ev in evidence.keys():
             states = []
-            for j in range (len(evidence[ev])):
+            for j in range(len(evidence[ev])):
                 states.append(j)
             allstates.append(states)
 
@@ -419,25 +419,25 @@ class BayesianNetwork:
 
         for i in range(0, len(sequence)):
             for j, name in enumerate(evidence.keys()):
-                # print 'val ', c[i][j]
+                # print "val ", c[i][j]
                 sequenceDict[name].append(sequence[i][j])
 
         ##############################################################
 
         ##############################################################
         # PERFORM INFERENCE TO GENERATE QUERIED PDs
-        # FOR EACH SEQUENCE OF HARD EVIDENCE (SHAOWEI' METHOD)
+        # FOR EACH SEQUENCE OF HARD EVIDENCE (SHAOWEI"S METHOD)
         ##############################################################
         allStatesQueriedMarginalPosteriors = []
 
         # access list of states
 
-        # combinations = [[ {var:0}, {var:0}, {var:0}, {var:0}, {var:0}], [0, 0, 0, 0, 1], ...... ]
-        # combinations = {var: [0, 1, 2, 3, 4, .............. , 1], var: [0, 1, 2, 3, 4, ....... , 1], ... }
+        # combinations = [[ {var:0}, {var:0}, {var:0}, {var:0}, {var:0}], [0, 0, 0, 0, 1], ...]
+        # combinations = {var: [0, 1, 2, 3, 4, ..., 1], var: [0, 1, 2, 3, 4, ..., 1], ...}
 
         # For each combination of evidence states
 
-        for i in range (0, len(sequence)):
+        for i in range(0, len(sequence)):
             e = {}
             for var in evidence.keys():
                 e[var] = sequenceDict[var][i] # dictionary
@@ -452,7 +452,7 @@ class BayesianNetwork:
                 probabilities = printdist(result, self.learnedBaynet)
 
                 for varName in query.keys():
-                    marginalPosterior = probabilities.groupby(varName, as_index = False)['probability'].sum()
+                    marginalPosterior = probabilities.groupby(varName, as_index = False)["probability"].sum()
                     marginalPosterior.sort_values([varName], inplace = True)
                     queriedMarginalPosteriors.append(marginalPosterior)  # returns a list of dataframes, each with probability distribution for each queried variable
 
@@ -471,20 +471,20 @@ class BayesianNetwork:
         postInferencePDs = {}
         assembledPosterior = []
 
-        for i, queryVarName in enumerate (query.keys()): # for each queried PD
-            # print 'query varname ', queryVarName
+        for i, queryVarName in enumerate(query.keys()): # for each queried PD
+            # print "query varname ", queryVarName
 
             # num_states = len(self.BNdata.binRanges[queryVarName])
-            num_states = len(allStatesQueriedMarginalPosteriors[0][i]['probability'].tolist()) # queried states
+            num_states = len(allStatesQueriedMarginalPosteriors[0][i]["probability"].tolist()) # queried states
 
-            for j in range (0, num_states): # for each state in each queried PD
+            for j in range(0, num_states): # for each state in each queried PD
 
                 sum = 0
 
-                for k in range (0, len(sequence)):
+                for k in range(0, len(sequence)):
 
                     # sequence (0, 0), (0, 1), (0, 2), ....
-                    # sequenceDict = {var: [0, 1, 2, 3, 4, .............. , 1], var: [0, 1, 2, 3, 4, ....... , 1], ... }
+                    # sequenceDict = {var: [0, 1, 2, 3, 4, ..., 1], var: [0, 1, 2, 3, 4, ..., 1], ...}
 
                     # holds list of probabilities to be multiplied by the
                     # conditional probability
@@ -493,7 +493,7 @@ class BayesianNetwork:
                     for var in evidence.keys():
                         index = sequenceDict[var][k] # index of evidence state
                         ev.append(evidence[var][index]) # calling the inputted probabilities by index
-                    
+
                     if all(v == 0 for v in ev):
                         continue
 
@@ -505,14 +505,14 @@ class BayesianNetwork:
                     for e in ev:
                         if e != 0.0:
                             multipliers.append(e)
-                            # print 'non zero e ',e
+                            # print "non zero e ",e
 
-                    # sum += (allStatesQueriedMarginalPosteriors[k][i]['probability'].tolist()[j] * (reduce(lambda x, y: x * y, multiplier)))
+                    # sum += (allStatesQueriedMarginalPosteriors[k][i]["probability"].tolist()[j] * (reduce(lambda x, y: x * y, multiplier)))
                     ########################
 
-                    sum+= (allStatesQueriedMarginalPosteriors[k][i]['probability'].tolist()[j]* (reduce(lambda x, y: x * y, ev)))
+                    sum+= (allStatesQueriedMarginalPosteriors[k][i]["probability"].tolist()[j]* (reduce(lambda x, y: x * y, ev)))
 
-                assembledP[i].set_value(j, 'probability', sum) # data frame
+                assembledP[i].set_value(j, "probability", sum) # data frame
                 assembledPosterior.append(sum) # list
 
             ## this is a cheating step to order probabilities by index of df ... should be fixed somwehre before. Compare results with pybbn and bayesialab
@@ -521,9 +521,9 @@ class BayesianNetwork:
             ##
 
             assembledPosteriors.append(assembledPosterior)
-            postInferencePDs.update({queryVarName: assembledP[i]['probability'].tolist()})
+            postInferencePDs.update({queryVarName: assembledP[i]["probability"].tolist()})
 
-            # postInferencePDs[queryVarName] = assembledP[i]['probability'].tolist() # for visualising PDs
+            # postInferencePDs[queryVarName] = assembledP[i]["probability"].tolist() # for visualising PDs
 
         # for visualising evidence PDs
         for evidenceVarName in evidence.keys():
@@ -534,7 +534,7 @@ class BayesianNetwork:
     def inferPD_4(self, query, evidence, plot=False):
         """
         Perform inference on the Bayesian network using soft evidence with
-        Shaowei's method, which uses a junction tree for inference.
+        Shaowei"s method, which uses a junction tree for inference.
 
         Parameters
         ----------
@@ -560,8 +560,8 @@ class BayesianNetwork:
 
         # evidence is provided in the form of a dict:
         # {
-        #   'x1': [0.2, 0.1, 0.4, 0.0, 0.3],
-        #   'x2': [1.0, 0.0, 0.0, 0.0, 0.0], ...
+        #   "x1": [0.2, 0.1, 0.4, 0.0, 0.3],
+        #   "x2": [1.0, 0.0, 0.0, 0.0, 0.0], ...
         # }
 
         ##############################################################
@@ -572,7 +572,7 @@ class BayesianNetwork:
         allstates = []
         for ev in evidence.keys():
             states = []
-            for j in range (len(evidence[ev])):
+            for j in range(len(evidence[ev])):
                 states.append(j)
             allstates.append(states)
 
@@ -584,10 +584,10 @@ class BayesianNetwork:
 
         for i in range(0, len(sequence)):
             for j, name in enumerate(evidence.keys()):
-                # print 'val ', c[i][j]
+                # print "val ", c[i][j]
                 sequenceDict[name].append(sequence[i][j])
 
-        print ' __________________________________ sequence dict', sequenceDict
+        print " __________________________________ sequence dict", sequenceDict
 
         ##############################################################
         # PERFORM INFERENCE TO GENERATE QUERIED PDs
@@ -611,14 +611,14 @@ class BayesianNetwork:
         #   ]
         # ]
         # combinations = {
-        #   var: [0, 1, 2, 3, 4, .............. , 1],
-        #   var: [0, 1, 2, 3, 4, ....... , 1],
+        #   var: [0, 1, 2, 3, 4, ..., 1],
+        #   var: [0, 1, 2, 3, 4, ..., 1],
         #   ...
         # }
 
         # For each combination of evidence states
 
-        for i in range (0, len(sequence)):
+        for i in range(0, len(sequence)):
 
             e = {}
             for var in evidence.keys():
@@ -634,25 +634,25 @@ class BayesianNetwork:
         # dummy list of queried PD dicts
         assembledP = allStatesQueriedMarginalPosteriors[0]
 
-        # for index, state in enumerate (allStatesQueriedMarginalPosteriors):
+        # for index, state in enumerate(allStatesQueriedMarginalPosteriors):
 
         # for varName in evidence.keys():  # for each evidence variable
 
         postInferencePDs = {}
         assembledPosterior = []
 
-        for i, queryVarName in enumerate (query.keys()): # for each queried PD
+        for i, queryVarName in enumerate(query.keys()): # for each queried PD
             # num_states= len(self.BNdata.binRanges[queryVarName])
-            num_states = len(allStatesQueriedMarginalPosteriors[0][i]['probability'].tolist()) # queried states
+            num_states = len(allStatesQueriedMarginalPosteriors[0][i]["probability"].tolist()) # queried states
 
-            for j in range (0, num_states): # for each state in each queried PD
+            for j in range(0, num_states): # for each state in each queried PD
 
                 sum = 0
 
-                for k in range (0, len(sequence)):
+                for k in range(0, len(sequence)):
 
-                    # sequence (0, 0), (0, 1), (0, 2), ....
-                    # sequenceDict = {var: [0, 1, 2, 3, 4, .............. , 1], var: [0, 1, 2, 3, 4, ....... , 1], ... }
+                    # sequence (0, 0), (0, 1), (0, 2), ...
+                    # sequenceDict = {var: [0, 1, 2, 3, 4, ..., 1], var: [0, 1, 2, 3, 4, ..., 1], ...}
 
                     # holds list of probabilities to be multiplied by the
                     # conditional probability
@@ -662,9 +662,9 @@ class BayesianNetwork:
                         index = sequenceDict[var][k]  # index of evidence state
                         ev.append(evidence[var][index])  # calling the inputted probabilities by index
 
-                    sum+= (allStatesQueriedMarginalPosteriors[k][i]['probability'].tolist()[j]* (reduce(lambda x, y: x * y, ev)))
+                    sum+= (allStatesQueriedMarginalPosteriors[k][i]["probability"].tolist()[j]* (reduce(lambda x, y: x * y, ev)))
 
-                assembledP[i].set_value(j, 'probability', sum)  # data frame
+                assembledP[i].set_value(j, "probability", sum)  # data frame
                 assembledPosterior.append(sum)  # list
 
             ##########################################
@@ -677,10 +677,10 @@ class BayesianNetwork:
 
             assembledPosteriors.append(assembledPosterior)
 
-            postInferencePDs[list(assembledP[i])[0]] = assembledP[i]['probability'].tolist()
+            postInferencePDs[list(assembledP[i])[0]] = assembledP[i]["probability"].tolist()
 
-            # postInferencePDs.update({queryVarName: assembledP[i]['probability'].tolist()})
-            # postInferencePDs[queryVarName] = assembledP[i]['probability'].tolist() # for visualising PDs
+            # postInferencePDs.update({queryVarName: assembledP[i]["probability"].tolist()})
+            # postInferencePDs[queryVarName] = assembledP[i]["probability"].tolist() # for visualising PDs
 
         # for visualising evidence PDs
         for evidenceVarName in evidence.keys():
@@ -703,8 +703,8 @@ class BayesianNetwork:
             total = sum(sum(x) for x in bincounts[varName])
             priors = []
             for count in bincounts[varName]:
-                # print 'total ', total
-                # print 'count ', count[0]
+                # print "total ", total
+                # print "count ", count[0]
 
                 priors.append(float(count[0]) / float(total))
 
@@ -728,41 +728,51 @@ class BayesianNetwork:
             edge = []
 
             for index, range in enumerate(binRanges[varName]):
-                print 'range ', range
+                print "range ", range
                 edge.append(range[0])
                 binwidths.append(range[1] - range[0])
                 xticksv.append(((range[1] - range[0]) / 2) + range[0])
                 if index == len(binRanges[varName]) - 1: edge.append(range[1])
 
             # df[var_name].hist(bins = binwidths[var_name],ax = ax)
-            ax.bar(xticksv, priorPDs[varName], align='center', width = binwidths, color='black', alpha=0.2)
+            ax.bar(xticksv, priorPDs[varName], align="center", width = binwidths, color="black", alpha=0.2)
 
             evidenceVars = []
-            if 'evidence' in kwargs:
-                evidenceVars = kwargs['evidence']
+            if "evidence" in kwargs:
+                evidenceVars = kwargs["evidence"]
 
-            if 'posteriorPD' in kwargs:
-                if len(kwargs['posteriorPD'][varName]) > 1:
-                    print 'name ', varName
-                    print 'hello ', kwargs['posteriorPD'][varName]
-                    print 'binwidths ', binwidths
+            if "posteriorPD" in kwargs:
+                if len(kwargs["posteriorPD"][varName]) > 1:
+                    print "name ", varName
+                    print "hello ", kwargs["posteriorPD"][varName]
+                    print "binwidths ", binwidths
                     if varName in evidenceVars:
-                        ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='green',
-                               alpha=0.2)
+                        ax.bar(
+                            xticksv,
+                            kwargs["posteriorPD"][varName],
+                            align="center",
+                            width=binwidths,
+                            color="green",
+                            alpha=0.2)
 
                     else:
-                        ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='red',
-                               alpha=0.2)
+                        ax.bar(
+                            xticksv,
+                            kwargs["posteriorPD"][varName],
+                            align="center",
+                            width=binwidths,
+                            color="red",
+                            alpha=0.2)
 
             # TODO: fix xticks .... not plotting all
             # plt.xlim(edge[0], max(edge))
-            plt.xticks([round(e, 4) for e in edge], rotation='vertical')
+            plt.xticks([round(e, 4) for e in edge], rotation="vertical")
             plt.ylim(0, 1)
             # plt.show()
 
 
-            ax.grid(color='0.2', linestyle=':', linewidth=0.1, dash_capstyle='round')
-            # ax.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
+            ax.grid(color="0.2", linestyle=":", linewidth=0.1, dash_capstyle="round")
+            # ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
             ax.set_title(varName, fontweight="bold", size=6)
             ax.set_ylabel(ylabel, fontsize=7)  # Y label
             ax.set_xlabel(xlabel, fontsize=7)  # X label
@@ -770,8 +780,8 @@ class BayesianNetwork:
             ax.yaxis.set_tick_params(labelsize=6)
 
             # ax.grid(False)
-            # if 'xlim' in kwargs:
-            #    ax.set_xlim(kwargs['xlim'][0], kwargs['xlim'][1])
+            # if "xlim" in kwargs:
+            #    ax.set_xlim(kwargs["xlim"][0], kwargs["xlim"][1])
 
             i += 1
 
@@ -782,14 +792,14 @@ class BayesianNetwork:
         fig.subplots_adjust(top=0.85)
 
         # if you want to set background of figure to transparent, do it here.
-        # Use facecolor='none' as argument in savefig()
+        # Use facecolor="none" as argument in savefig()
 
         if displayplt == True:
             plt.show()
 
     """
 
-    def plotPDs (self, maintitle, xlabel, ylabel, displayplt = False, **kwargs ):
+    def plotPDs(self, maintitle, xlabel, ylabel, displayplt = False, **kwargs):
         """
         Plots the probability distributions of the nodes in the Bayesian
         Network.
@@ -813,7 +823,7 @@ class BayesianNetwork:
         # dimensions of the figure
 
         n_totalplots = len(self.nodes)
-        print 'num of total plots ', n_totalplots
+        print "num of total plots ", n_totalplots
 
         if n_totalplots <= 4:
             n_cols = n_totalplots
@@ -821,10 +831,10 @@ class BayesianNetwork:
         else:
             n_cols = 4
             n_rows = n_totalplots % 4
-            print 'num rows ', n_rows
+            print "num rows ", n_rows
 
         if n_rows == 0:
-            n_rows = n_totalplots/4
+            n_rows = n_totalplots / 4
 
         # generate the probability distributions for the prior distributions
         binRanges = self.BNdata.binRanges
@@ -840,14 +850,16 @@ class BayesianNetwork:
             total = sum(sum(x) for x in bincounts[varName])
             priors = []
             for count in bincounts[varName]:
-                priors.append(float(count[0])/float(total))
+                priors.append(float(count[0]) / float(total))
 
             priorPDs[varName] = priors
 
         # for varName in binRanges: draw_barchartpd(binRanges[varName],priorPDs[varName])
 
         # instantiate a figure as a placaholder for each distribution (axes)
-        fig = plt.figure(figsize=((200 * n_cols) / 96, (200 * n_rows) / 96), dpi=96, facecolor='white')
+        height = (200 * n_cols) / 96
+        width = (200 * n_rows) / 96
+        fig = plt.figure(figsize=(height, width), dpi=96, facecolor="white")
         fig.suptitle(maintitle, fontsize=8) # title
 
         # sort evidence distributions to be plotted first
@@ -858,11 +870,11 @@ class BayesianNetwork:
 
         # evidence
         evidenceVars = []
-        if 'evidence' in kwargs:
-            evidenceVars = kwargs['evidence']
+        if "evidence" in kwargs:
+            evidenceVars = kwargs["evidence"]
 
             # sort evidence variables to be in the beginning of the list
-            for index, var in enumerate (evidenceVars):
+            for index, var in enumerate(evidenceVars):
                 nodessorted.insert(index, nodessorted.pop(nodessorted.index(evidenceVars[index])))
 
         i = 0
@@ -886,27 +898,34 @@ class BayesianNetwork:
 
             # df[var_name].hist(bins = binwidths[var_name],ax = ax)
             # plot the priors
-            ax.bar(xticksv, priorPDs[varName], align='center', width = binwidths, color='black', alpha=0.2, linewidth=0.2)
+            ax.bar(
+                xticksv,
+                priorPDs[varName],
+                align="center",
+                width=binwidths,
+                color="black",
+                alpha=0.2,
+                linewidth=0.2)
 
             # filter out evidence and query to color the bars accordingly (evidence-green, query-red)
-            if 'posteriorPD' in kwargs:
-                if len(kwargs['posteriorPD'][varName]) > 1:
+            if "posteriorPD" in kwargs:
+                if len(kwargs["posteriorPD"][varName]) > 1:
                     if varName in evidenceVars:
-                        ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='green', alpha=0.2, linewidth=0.2)
+                        ax.bar(xticksv, kwargs["posteriorPD"][varName], align="center", width = binwidths, color="green", alpha=0.2, linewidth=0.2)
                     else:
-                        ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='red', alpha=0.2, linewidth=0.2)
+                        ax.bar(xticksv, kwargs["posteriorPD"][varName], align="center", width = binwidths, color="red", alpha=0.2, linewidth=0.2)
 
             # TODO: fix xticks .... not plotting all
             # plt.xlim(edge[0], max(edge))
-            plt.xticks([round(e, 4) for e in edge], rotation='vertical')
+            plt.xticks([round(e, 4) for e in edge], rotation="vertical")
             plt.ylim(0, 1)
             # plt.show()
 
             for spine in ax.spines:
                 ax.spines[spine].set_linewidth(0)
 
-            ax.grid(color='0.2', linestyle=':', linewidth=0.1, dash_capstyle='round')
-            # ax.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
+            ax.grid(color="0.2", linestyle=":", linewidth=0.1, dash_capstyle="round")
+            # ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
             ax.set_title(varName, fontweight="bold", size=6)
             ax.set_ylabel(ylabel, fontsize=7)  # Y label
             ax.set_xlabel(xlabel, fontsize=7)  # X label
@@ -914,8 +933,8 @@ class BayesianNetwork:
             ax.yaxis.set_tick_params(labelsize=6, length = 0)
 
             # ax.grid(False)
-            # if 'xlim' in kwargs:
-            #    ax.set_xlim(kwargs['xlim'][0], kwargs['xlim'][1])
+            # if "xlim" in kwargs:
+            #    ax.set_xlim(kwargs["xlim"][0], kwargs["xlim"][1])
 
             i += 1
 
@@ -926,13 +945,13 @@ class BayesianNetwork:
         fig.subplots_adjust(top=0.85)
 
         # if you want to set background of figure to transparent, do it here.
-        # Use facecolor='none' as argument in savefig()
+        # Use facecolor="none" as argument in savefig()
 
         if displayplt == True:
             plt.show()
 
 
-    def crossValidate (self, targetList, numFolds):
+    def crossValidate(self, targetList, numFolds):
         """
         Performs k-fold cross-validation on the Bayesian Network, returning a
         dictionary of error dataframes, one for each target.
@@ -959,12 +978,12 @@ class BayesianNetwork:
         # create empty dataframes to store errors for each target
 
         for target in targetList:
-            df_columns = ['NRMSE', 'LogLoss', 'Classification Error', 'Distance Error']
-            df_indices = ['Fold_%s' % (num + 1) for num in range(numFolds)]
+            df_columns = ["NRMSE", "LogLoss", "Classification Error", "Distance Error"]
+            df_indices = ["Fold_%s" % (num + 1) for num in range(numFolds)]
             error_df = pandas.DataFrame(index = df_indices, columns = df_columns)
             error_df = error_df.fillna(0.0)
-            error_df['Distance Error'] = error_df['Distance Error'].astype(object)
-            error_df['Classification Error'] = error_df['Classification Error'].astype(object)
+            error_df["Distance Error"] = error_df["Distance Error"].astype(object)
+            error_df["Classification Error"] = error_df["Classification Error"].astype(object)
 
             error_dict[target] = error_df
 
@@ -978,16 +997,16 @@ class BayesianNetwork:
 
         # loop through all data and split into training and testing for each fold
         for training_index, testing_index in kf.split(self.BNdata.data):
-            print '--------------------- FOLD NUMBER ', fold_counter+1, '  ---------------------'
+            print "------- FOLD NUMBER ", fold_counter+1, "  ----------------"
 
-            trainingData = kfoldToDF(training_index,self.BNdata.data)
+            trainingData = kfoldToDF(training_index, self.BNdata.data)
             testingData = kfoldToDF(testing_index, self.BNdata.data)
 
             # bin test/train data
             binRanges = self.BinRanges
-            # binRanges = getBinRanges(trainingData,self.BNdata.binTypeDict,self.BNdata.numBinsDict)
-            binnedTrainingDict, binnedTrainingData, binCountsTr = discretize(trainingData,binRanges,False)
-            binnedTestingDict, binnedTestingData, binCountsTest = discretize(testingData,binRanges,False)
+            # binRanges = getBinRanges(trainingData, self.BNdata.binTypeDict, self.BNdata.numBinsDict)
+            binnedTrainingDict, binnedTrainingData, binCountsTr = discretize(trainingData, binRanges, False)
+            binnedTestingDict, binnedTestingData, binCountsTest = discretize(testingData, binRanges, False)
             binnedTestingData = binnedTestingData.astype(int)
 
             # estimate BN parameters
@@ -1014,7 +1033,7 @@ class BayesianNetwork:
                     # more than 1 target was specified
                     posteriors = printdist(result, baynet)
                     for target in targetList:
-                        marginalPosterior = posteriors.groupby(target)['probability'].sum()
+                        marginalPosterior = posteriors.groupby(target)["probability"].sum()
                         # marginalTargetPosteriorsDf[target][i] = marginalPosterior
                         marginalTargetPosteriorsDict[target].append(marginalPosterior) # might need [probability]
 
@@ -1022,8 +1041,8 @@ class BayesianNetwork:
                     # only 1 target was specified
                     posterior = printdist(result, baynet)
                     posterior.sort_values([targetList[0]],inplace = True) # to make sure probabilities are listed in order of bins, sorted by first queried variable
-                    # marginalTargetPosteriorsDf[targetList[0]][i] = posterior['probability']
-                    marginalTargetPosteriorsDict[target].append(posterior['probability'])
+                    # marginalTargetPosteriorsDf[targetList[0]][i] = posterior["probability"]
+                    marginalTargetPosteriorsDict[target].append(posterior["probability"])
 
             # generate accuracy measures at one go
             # for each target
@@ -1031,17 +1050,17 @@ class BayesianNetwork:
                 rmse, loglossfunction, norm_distance_errors, correct_bin_probabilities = generateErrors(marginalTargetPosteriorsDict[key], testingData, binnedTestingData, binRanges, key)
 
                 # add generated measures to error_df (error dataframe)
-                error_dict[key]['NRMSE'][fold_counter] = rmse
-                error_dict[key]['LogLoss'][fold_counter] = loglossfunction
-                error_dict[key]['Distance Error'][fold_counter] = norm_distance_errors
-                error_dict[key]['Classification Error'][fold_counter] = correct_bin_probabilities
+                error_dict[key]["NRMSE"][fold_counter] = rmse
+                error_dict[key]["LogLoss"][fold_counter] = loglossfunction
+                error_dict[key]["Distance Error"][fold_counter] = norm_distance_errors
+                error_dict[key]["Classification Error"][fold_counter] = correct_bin_probabilities
 
             fold_counter += 1
             # listRMSE += rmse
             # listLogLoss += loglossfunction
 
-        # averageRMSE = sum(listRMSE)/float(numFolds)
-        # averageLogLoss = sum(listLogLoss)/float(numFolds)
+        # averageRMSE = sum(listRMSE) / float(numFolds)
+        # averageLogLoss = sum(listLogLoss) / float(numFolds)
 
         return error_dict
 
@@ -1072,12 +1091,12 @@ class BayesianNetwork:
         # create empty dataframes to store errors for each target
 
         for target in targetList:
-            df_columns = ['NRMSE', 'LogLoss', 'Classification Error', 'Distance Error']
-            df_indices = ['Fold_%s' % (num + 1) for num in range(numFolds)]
+            df_columns = ["NRMSE", "LogLoss", "Classification Error", "Distance Error"]
+            df_indices = ["Fold_%s" % (num + 1) for num in range(numFolds)]
             error_df = pandas.DataFrame(index = df_indices, columns = df_columns)
             error_df = error_df.fillna(0.0)
-            error_df['Distance Error'] = error_df['Distance Error'].astype(object)
-            error_df['Classification Error'] = error_df['Classification Error'].astype(object)
+            error_df["Distance Error"] = error_df["Distance Error"].astype(object)
+            error_df["Classification Error"] = error_df["Classification Error"].astype(object)
 
             error_dict[target] = error_df
 
@@ -1091,8 +1110,7 @@ class BayesianNetwork:
 
         # loop through all data and split into training and testing for each fold
         for training_index, testing_index in kf.split(self.BNdata.data):
-
-            print '--------------------- FOLD NUMBER ', fold_counter + 1, '  ---------------------'
+            print "------- FOLD NUMBER ", fold_counter+1, "  ----------------"
 
             trainingData = kfoldToDF(training_index, self.BNdata.data)
             testingData = kfoldToDF(testing_index, self.BNdata.data)
@@ -1111,7 +1129,7 @@ class BayesianNetwork:
             # JOIN TREE USING PYBBN
             ###########################################
             # get topology of bn
-            json_data = {'V': baynet.V, 'E': baynet.E, 'Vdata': baynet.Vdata}
+            json_data = {"V": baynet.V, "E": baynet.E, "Vdata": baynet.Vdata}
             # create BN with pybbn
             pybbn = Factory.from_libpgm_discrete_dictionary(self.json_data)
             # create join tree (this must be computed once)
@@ -1141,7 +1159,7 @@ class BayesianNetwork:
                     # more than 1 target was specified
                     posteriors = printdist(result, baynet)
                     for target in targetList:
-                        marginalPosterior = posteriors.groupby(target)['probability'].sum()
+                        marginalPosterior = posteriors.groupby(target)["probability"].sum()
                         # marginalTargetPosteriorsDf[target][i] = marginalPosterior
                         marginalTargetPosteriorsDict[target].append(marginalPosterior)  # might need [probability]
                 else:
@@ -1151,8 +1169,8 @@ class BayesianNetwork:
                     # to make sure probabilities are listed in order of bins, sorted by first queried variable
                     posterior.sort_values([targetList[0]],
                                           inplace = True)
-                    # marginalTargetPosteriorsDf[targetList[0]][i] = posterior['probability']
-                    marginalTargetPosteriorsDict[target].append(posterior['probability'])
+                    # marginalTargetPosteriorsDf[targetList[0]][i] = posterior["probability"]
+                    marginalTargetPosteriorsDict[target].append(posterior["probability"])
 
             # generate accuracy measures at one go
             # for each target
@@ -1161,17 +1179,17 @@ class BayesianNetwork:
                     marginalTargetPosteriorsDict[key], testingData, binnedTestingData, binRanges, key)
 
                 # add generated measures to error_df (error dataframe)
-                error_dict[key]['NRMSE'][fold_counter] = rmse
-                error_dict[key]['LogLoss'][fold_counter] = loglossfunction
-                error_dict[key]['Distance Error'][fold_counter] = norm_distance_errors
-                error_dict[key]['Classification Error'][fold_counter] = correct_bin_probabilities
+                error_dict[key]["NRMSE"][fold_counter] = rmse
+                error_dict[key]["LogLoss"][fold_counter] = loglossfunction
+                error_dict[key]["Distance Error"][fold_counter] = norm_distance_errors
+                error_dict[key]["Classification Error"][fold_counter] = correct_bin_probabilities
 
             fold_counter += 1
             # listRMSE += rmse
             # listLogLoss += loglossfunction
 
-        # averageRMSE = sum(listRMSE)/float(numFolds)
-        # averageLogLoss = sum(listLogLoss)/float(numFolds)
+        # averageRMSE = sum(listRMSE) / float(numFolds)
+        # averageLogLoss = sum(listLogLoss) / float(numFolds)
 
         return error_dict
 
@@ -1201,13 +1219,13 @@ class BayesianNetwork:
         # create empty dataframes to store errors for each target
 
         for target in targetList:
-            df_columns = ['NRMSE', 'LogLoss', 'Classification Error', 'Distance Error']
-            # df_indices = ['Fold_%s' % (num + 1) for num in range(numFolds)
+            df_columns = ["NRMSE", "LogLoss", "Classification Error", "Distance Error"]
+            # df_indices = ["Fold_%s" % (num + 1) for num in range(numFolds)
             df_indices = [0]
             error_df = pandas.DataFrame(index = df_indices, columns = df_columns)
             error_df = error_df.fillna(0.0)
-            error_df['Distance Error'] = error_df['Distance Error'].astype(object)
-            error_df['Classification Error'] = error_df['Classification Error'].astype(object)
+            error_df["Distance Error"] = error_df["Distance Error"].astype(object)
+            error_df["Classification Error"] = error_df["Classification Error"].astype(object)
 
             error_dict[target] = error_df
 
@@ -1238,10 +1256,14 @@ class BayesianNetwork:
             # create empty list for each target to populate with predicted target posterior distributions
             marginalTargetPosteriorsDict[target] = []
 
-        # In this loop we predict the posterior distributions for each queried target
-        # TODO: need to adapt this loop for storing predicted posteriors for each target in the list, and eventually calc error_df for each Target (or into one DF with multiple indices)
+        # TODO: need to adapt this loop for storing predicted posteriors for
+        # each target in the list, and eventually calc error_df for each Target
+        # (or into one DF with multiple indices)
 
         for i in range(0, binnedTestingData.shape[0]):
+            # In this loop, we predict the posterior distributions for each queried
+            # target
+
             row = binnedTestingDict[i]
             evidence = without_keys(row, queries.keys())
             fn = TableCPDFactorization(baynet)
@@ -1251,7 +1273,7 @@ class BayesianNetwork:
                 # more than 1 target was specified
                 posteriors = printdist(result, baynet)
                 for target in targetList:
-                    marginalPosterior = posteriors.groupby(target)['probability'].sum()
+                    marginalPosterior = posteriors.groupby(target)["probability"].sum()
                     # marginalTargetPosteriorsDf[target][i] = marginalPosterior
                     marginalTargetPosteriorsDict[target].append(marginalPosterior) # might need [probability]
 
@@ -1260,8 +1282,8 @@ class BayesianNetwork:
 
                 posterior = printdist(result, baynet)
                 posterior.sort_values([targetList[0]],inplace = True) # to make sure probabilities are listed in order of bins, sorted by first queried variable
-                # marginalTargetPosteriorsDf[targetList[0]][i] = posterior['probability']
-                marginalTargetPosteriorsDict[target].append(posterior['probability'])
+                # marginalTargetPosteriorsDf[targetList[0]][i] = posterior["probability"]
+                marginalTargetPosteriorsDict[target].append(posterior["probability"])
 
         # generate accuracy measures at one go
         # for each target
@@ -1269,16 +1291,16 @@ class BayesianNetwork:
             rmse, loglossfunction, norm_distance_errors, correct_bin_probabilities = generateErrors(marginalTargetPosteriorsDict[key], testingData, binnedTestingData, binRanges, key)
 
             # add generated measures to error_df (error dataframe)
-            error_dict[key]['NRMSE'][0] = rmse
-            error_dict[key]['LogLoss'][0] = loglossfunction
-            error_dict[key]['Distance Error'][0] = norm_distance_errors
-            error_dict[key]['Classification Error'][0] = correct_bin_probabilities
+            error_dict[key]["NRMSE"][0] = rmse
+            error_dict[key]["LogLoss"][0] = loglossfunction
+            error_dict[key]["Distance Error"][0] = norm_distance_errors
+            error_dict[key]["Classification Error"][0] = correct_bin_probabilities
 
         # listRMSE += rmse
         # listLogLoss += loglossfunction
 
-        # averageRMSE = sum(listRMSE)/float(numFolds)
-        # averageLogLoss = sum(listLogLoss)/float(numFolds)
+        # averageRMSE = sum(listRMSE) / float(numFolds)
+        # averageLogLoss = sum(listLogLoss) / float(numFolds)
 
         return error_dict
 
@@ -1302,10 +1324,10 @@ class BayesianNetwork:
             variables.
         """
 
-        # hardEvidence is supplied in the form {'max_def': 5, 'span': 4}
+        # hardEvidence is supplied in the form {"max_def": 5, "span": 4}
         # converts libpgm to pybnn then use pybnn to run junction tree and then spitback out results for visualising
 
-        print 'performing inference using junction tree algorithm ...'
+        print "performing inference using junction tree algorithm ..."
 
         # convert soft evidence to hard
 
@@ -1315,7 +1337,7 @@ class BayesianNetwork:
             for i in range(0, len(hardEvidence[var])):
                 if hardEvidence[var][i] == 1.0: formattedEvidence[var] = i
 
-        print 'formatted evidence ',formattedEvidence
+        print "formatted evidence ",formattedEvidence
 
         def potential_to_df(p):
             """
@@ -1329,7 +1351,7 @@ class BayesianNetwork:
             Returns
             -------
             df : DataFrame
-                A dataframe with columns 'val' and 'p' representing value and 
+                A dataframe with columns "val" and "p" representing value and
                 probability respectively.
             """
             data = []
@@ -1338,7 +1360,7 @@ class BayesianNetwork:
                 p = pe.value
                 t = (v, p)
                 data.append(t)
-            return pd.DataFrame(data, columns=['val', 'p'])
+            return pd.DataFrame(data, columns=["val", "p"])
 
         def potentials_to_dfs(join_tree):
             """
@@ -1385,8 +1407,8 @@ class BayesianNetwork:
             for node in pybbnPosteriors:
                 var = node[0]
                 df = node[1]
-                p = df.sort_values(by=['val'])
-                posteriors[var] = p['p'].tolist()
+                p = df.sort_values(by=["val"])
+                posteriors[var] = p["p"].tolist()
 
             return posteriors # returns a dictionary of dataframes
 
@@ -1407,7 +1429,7 @@ class BayesianNetwork:
 
         posteriors = potentials_to_dfs(self.join_tree)
 
-        # print 'posteriors from joint tree ',posteriors
+        # print "posteriors from joint tree ",posteriors
 
 
         # join tree algorithm seems to eliminate bins whose posterior
@@ -1418,26 +1440,26 @@ class BayesianNetwork:
             # numbins = self.numBinsDict[posterior[0]]
             numbins = len(self.BinRanges[posterior[0]])
 
-            for i in range (0,numbins):
-                if float (i) not in posterior[1]['val'].tolist():
-                    # print 'bin number ', float(i) ,' was missing '
+            for i in range(0,numbins):
+                if float(i) not in posterior[1]["val"].tolist():
+                    # print "bin number ", float(i), " was missing "
                     posterior[1].loc[len(posterior[1])] = [float(i), 0.0]
                     continue
 
         # TODO: remove the following lines? function should return evidence +
         # query posteriors or only latter? --> decide based on plotting req
-        # for i, pos in enumerate (posteriors):
+        # for i, pos in enumerate(posteriors):
 
         #    if str(pos[0]) in hardEvidence.keys():
         #        posteriors.remove(pos)
                 # del posteriors[i]
 
         posteriorsDict = pybbnToLibpgm_posteriors(posteriors)
-        print 'inference is complete ... posterior distributions were generated successfully'
+        print "inference is complete ... posterior distributions were generated successfully"
 
         return posteriorsDict
 
-    def inferPD_JT_soft (self, softEvidence ):
+    def inferPD_JT_soft(self, softEvidence):
         """
         Performs inference on the Bayesian Network using soft evidence
         (virtual) and the junction tree algorithm.
@@ -1459,11 +1481,11 @@ class BayesianNetwork:
         # TODO: currently you can only enter likelihoods. Need to find way to
         # enter probabilities and convert them to likelihoods.
 
-        print 'performing inference using junction tree algorithm ...'
+        print "performing inference using junction tree algorithm ..."
 
         # softEvidence = self.convertEvidence(humanEvidence)
 
-        # print 'soft evidence ', softEvidence
+        # print "soft evidence ", softEvidence
 
         def potential_to_df(p):
             data = []
@@ -1472,7 +1494,7 @@ class BayesianNetwork:
                 p = pe.value
                 t = (v, p)
                 data.append(t)
-            return pd.DataFrame(data, columns=['val', 'p'])
+            return pd.DataFrame(data, columns=["val", "p"])
 
         def potentials_to_dfs(join_tree):
             data = []
@@ -1491,8 +1513,8 @@ class BayesianNetwork:
             for node in pybbnPosteriors:
                 var = node[0]
                 df = node[1]
-                p = df.sort_values(by=['val'])
-                posteriors[var] = p['p'].tolist()
+                p = df.sort_values(by=["val"])
+                posteriors[var] = p["p"].tolist()
 
             return posteriors # returns a dictionary of dataframes
 
@@ -1505,7 +1527,9 @@ class BayesianNetwork:
             for state, likelihood in enumerate(softEvidence[evName]):
                 ev.values[state] = likelihood
 
-            ev = ev.with_type(EvidenceType.VIRTUAL).build() # specify evidenc type as virtual (soft) (likelihoods not probabilities)
+            # specify evidence type as virtual (soft) (likelihoods, not
+            # probabilities)
+            ev = ev.with_type(EvidenceType.VIRTUAL).build()
             evidenceList.append(ev)
 
         self.join_tree.unobserve_all()
@@ -1517,7 +1541,7 @@ class BayesianNetwork:
 
         # posteriordistributions = [] # contains posterior distributions of queried variables only
 
-        # for i, pos in enumerate (alldistributions):
+        # for i, pos in enumerate(alldistributions):
 
             # if str(pos[0]) not in softEvidence.keys():
                 # posteriordistributions.append(pos)
@@ -1526,13 +1550,13 @@ class BayesianNetwork:
         # the following checks for missing bins and adds them back
 
         for posterior in posteriors:
-            print 'posssssssterior ', posterior
+            print "posssssssterior ", posterior
             # numbins = self.BNdata.numBinsDict[posterior[0]]
             numbins = len(self.BinRanges[posterior[0]])
 
-            for i in range (0,numbins):
-                if float (i) not in posterior[1]['val'].tolist():
-                    # print 'bin number ', float(i) ,' was missing '
+            for i in range(0,numbins):
+                if float(i) not in posterior[1]["val"].tolist():
+                    # print "bin number ", float(i), " was missing "
                     posterior[1].loc[len(posterior[1])] = [float(i), 0.0]
                     continue
 
@@ -1543,20 +1567,20 @@ class BayesianNetwork:
         posteriordistributionsDict = {}
         for dataf in libpgmPosteriors:
             varname = list(dataf)[0]
-            posteriordistributionsDict[varname] = dataf['probabilities'].tolist()
+            posteriordistributionsDict[varname] = dataf["probabilities"].tolist()
 
         alldistributionsDict = {}
         for dataf in libpgmAlldistributions:
             varname = list(dataf)[0]
-            alldistributionsDict[varname] = dataf['probabilities'].tolist()
+            alldistributionsDict[varname] = dataf["probabilities"].tolist()
         """
         # return posteriordistributionsDict, alldistributionsDict
 
-        print 'inference is complete ... posterior distributions were generated successfully'
+        print "inference is complete ... posterior distributions were generated successfully"
 
         return posteriorsDict  # posteriors + evidence distributions (for visualising)
 
-    def convertEvidence (self, humanEvidence):
+    def convertEvidence(self, humanEvidence):
         """
         Converts human-readable evidence into a format understandable by the
         Bayesian Network.
@@ -1596,7 +1620,7 @@ class BayesianNetwork:
 
         # loop through variables in list of inputted evidences
         for var in humanEvidence:
-            # print 'var is ', var
+            # print "var is ", var
             if type(humanEvidence[var]) == list:
 
                 input_range_min = humanEvidence[var][0]
@@ -1608,8 +1632,8 @@ class BayesianNetwork:
                 # loop through bin ranges of variable "var"
                 for index, binRange in enumerate(ranges[var]):
 
-                    # print 'binRange ',binRange
-                    # if index==0:
+                    # print "binRange ",binRange
+                    # if index == 0:
                     # this is the first bin so bin numbers larger or equal
                     # than min num and less or equal than max num (basically,
                     # include min num)
@@ -1623,13 +1647,13 @@ class BayesianNetwork:
             #    hard_num = float(humanEvidence[var])
 
         for item in allevidence:
-            print item, ' -- ', allevidence[item]
+            print item, " -- ", allevidence[item]
 
         return allevidence
 
 
     """
-    def plotAllNodeDistributions (self, bin_ranges, binnedData, maintitle):
+    def plotAllNodeDistributions(self, bin_ranges, binnedData, maintitle):
 
         # calc bin widths as per bin ranges
         trainingBinWidths = {}
@@ -1646,96 +1670,100 @@ class BayesianNetwork:
             trainingBinWidths[vName] = binwidths
 
         # plot matrix
-        draw_histograms(binnedData, trainingBinWidths, len(binnedData)/4, 4, xlabel='Ranges ', ylabel='Frequency',maintitle= maintitle, saveplt = True, displayplt = False)
+        draw_histograms(binnedData, trainingBinWidths, len(binnedData) / 4, 4, xlabel="Ranges ", ylabel="Frequency",maintitle= maintitle, saveplt = True, displayplt = False)
 
     """
 
     """
-        def plotPDs2 (self,  maintitle, xlabel, ylabel, displayplt = False, **kwargs ): # plots the probability distributions
-            # calculate the probability densities for the prior distributions
-            binRanges = self.BNdata.binRanges
-            priorPDs = {}
+    def plotPDs2(self,  maintitle, xlabel, ylabel, displayplt = False, **kwargs):
+        """
+        plots the probability distributions
+        """
 
-            bincounts = self.BNdata.bincountsDict
+        # calculate the probability densities for the prior distributions
+        binRanges = self.BNdata.binRanges
+        priorPDs = {}
 
-            for varName in bincounts:
-                total = sum(sum(x) for x in bincounts[varName])
-                priors = []
-                for count in bincounts[varName]:
-                    priors.append(float(count[0])/float(total))
+        bincounts = self.BNdata.bincountsDict
 
-                priorPDs[varName] = priors
+        for varName in bincounts:
+            total = sum(sum(x) for x in bincounts[varName])
+            priors = []
+            for count in bincounts[varName]:
+                priors.append(float(count[0]) / float(total))
+
+            priorPDs[varName] = priors
 
 
-            # plot each axes in a figure
-            fig = plt.figure(figsize=(10, 10))
-            fig.suptitle(maintitle, fontsize=8)
-            # fig.subplots_adjust(hspace=1.0, wspace=1.0)
+        # plot each axes in a figure
+        fig = plt.figure(figsize=(10, 10))
+        fig.suptitle(maintitle, fontsize=8)
+        # fig.subplots_adjust(hspace=1.0, wspace=1.0)
 
-            i=0
-            sp = 421
+        i=0
+        sp = 421
 
-            for varName in binRanges:
-                # print df
-                # ax = fig.add_subplot(n_rows, n_cols, i + 1)
+        for varName in binRanges:
+            # print df
+            # ax = fig.add_subplot(n_rows, n_cols, i + 1)
 
-                ax = plt.subplot(sp)
+            ax = plt.subplot(sp)
 
-                xticksv = []
-                binwidths = []
-                edge = []
+            xticksv = []
+            binwidths = []
+            edge = []
 
-                for index, range in enumerate(binRanges[varName]):
-                    edge.append(range[0])
-                    binwidths.append(range[1] - range[0])
-                    xticksv.append(((range[1] - range[0]) / 2) + range[0])
-                    if index == len(binRanges[varName]) - 1: edge.append(range[1])
+            for index, range in enumerate(binRanges[varName]):
+                edge.append(range[0])
+                binwidths.append(range[1] - range[0])
+                xticksv.append(((range[1] - range[0]) / 2) + range[0])
+                if index == len(binRanges[varName]) - 1: edge.append(range[1])
 
-                # df[var_name].hist(bins = binwidths[var_name],ax = ax)
-                ax.bar(xticksv, priorPDs[varName], align='center', width = binwidths, color='black', alpha=0.2)
+            # df[var_name].hist(bins = binwidths[var_name],ax = ax)
+            ax.bar(xticksv, priorPDs[varName], align="center", width = binwidths, color="black", alpha=0.2)
 
-                evidenceVars = []
-                if 'evidence' in kwargs:
-                    evidenceVars = kwargs['evidence']
+            evidenceVars = []
+            if "evidence" in kwargs:
+                evidenceVars = kwargs["evidence"]
 
-                if 'posteriorPD' in kwargs:
-                    if len(kwargs['posteriorPD'][varName]) > 1:
-                        if varName in evidenceVars:
-                            ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='green', alpha=0.2)
+            if "posteriorPD" in kwargs:
+                if len(kwargs["posteriorPD"][varName]) > 1:
+                    if varName in evidenceVars:
+                        ax.bar(xticksv, kwargs["posteriorPD"][varName], align="center", width = binwidths, color="green", alpha=0.2)
 
-                        else:
-                            ax.bar(xticksv, kwargs['posteriorPD'][varName], align='center', width = binwidths, color='red', alpha=0.2)
+                    else:
+                        ax.bar(xticksv, kwargs["posteriorPD"][varName], align="center", width = binwidths, color="red", alpha=0.2)
 
-                # TODO: fix xticks .... not plotting all
-                # plt.xlim(edge[0], max(edge))
-                plt.xticks([round(e, 4) for e in edge], rotation='vertical')
-                plt.ylim(0, 1)
-                # plt.show()
+            # TODO: fix xticks .... not plotting all
+            # plt.xlim(edge[0], max(edge))
+            plt.xticks([round(e, 4) for e in edge], rotation="vertical")
+            plt.ylim(0, 1)
+            # plt.show()
 
-                ax.grid(color='0.2', linestyle=':', linewidth=0.1, dash_capstyle='round')
-                # ax.ticklabel_format(axis='x', style='sci', scilimits=(0, 0))
-                ax.set_title(varName, fontweight="bold", size=6)
-                ax.set_ylabel(ylabel, fontsize=7)  # Y label
-                ax.set_xlabel(xlabel, fontsize=7)  # X label
-                ax.xaxis.set_tick_params(labelsize=6)
-                ax.yaxis.set_tick_params(labelsize=6)
+            ax.grid(color="0.2", linestyle=":", linewidth=0.1, dash_capstyle="round")
+            # ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
+            ax.set_title(varName, fontweight="bold", size=6)
+            ax.set_ylabel(ylabel, fontsize=7)  # Y label
+            ax.set_xlabel(xlabel, fontsize=7)  # X label
+            ax.xaxis.set_tick_params(labelsize=6)
+            ax.yaxis.set_tick_params(labelsize=6)
 
-                # ax.grid(False)
-                # if 'xlim' in kwargs:
-                #    ax.set_xlim(kwargs['xlim'][0], kwargs['xlim'][1])
+            # ax.grid(False)
+            # if "xlim" in kwargs:
+            #    ax.set_xlim(kwargs["xlim"][0], kwargs["xlim"][1])
 
-                i += 1
-                sp += 1
+            i += 1
+            sp += 1
 
-            # Improve appearance a bit.
-            fig.tight_layout()
+        # Improve appearance a bit.
+        fig.tight_layout()
 
-            # Add white spacing between plots and title
-            fig.subplots_adjust(top=0.85)
+        # Add white spacing between plots and title
+        fig.subplots_adjust(top=0.85)
 
-            # if you want to set background of figure to transparent, do it here.
-            # Use facecolor='none' as argument in savefig()
+        # if you want to set background of figure to transparent, do it here.
+        # Use facecolor="none" as argument in savefig()
 
-            if displayplt == True:
-                plt.show()
+        if displayplt == True:
+            plt.show()
     """

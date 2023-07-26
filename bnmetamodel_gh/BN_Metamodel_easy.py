@@ -35,7 +35,7 @@ class BN_Metamodel_easy:
             A dictionary of additional keyword arguments. Current accepted keys
             are:
 
-            - 'numBinsDict': dict, optional
+            - "numBinsDict": dict, optional
                 A dictionary mapping variables to the number of bins to be
                 used in the BN for each variable. If not provided, the default
                 setting is 7 bins for each variable.
@@ -60,7 +60,7 @@ class BN_Metamodel_easy:
         if "numBinsDict" in kwargs:
             self.numBinsDict = kwargs["numBinsDict"]
 
-        # if 'binTypeDict' in kwargs:
+        # if "binTypeDict" in kwargs:
         for var in self.variables:
             if var in targets:
                 # default: all distributions are discretized by equal spacing
@@ -146,7 +146,7 @@ class BN_Metamodel_easy:
 
         This method computes posterior probabilities for the query variables,
         given the provided soft evidence. The evidence is treated as "soft",
-        meaning that it's treated as observations that have uncertainty. The
+        meaning that it is treated as observations that have uncertainty. The
         method also plots the resulting posterior distributions.
 
         Parameters
@@ -182,7 +182,7 @@ class BN_Metamodel_easy:
 
         This method computes posterior probabilities for the query variables,
         given the provided hard evidence. The evidence is treated as "hard",
-        meaning that it's treated as exact observations without uncertainty.
+        meaning that it is treated as exact observations without uncertainty.
         The method also plots the resulting posterior distributions.
 
         Parameters
@@ -219,9 +219,9 @@ class BN_Metamodel_easy:
 
         This method computes posterior probabilities for the query variables,
         given the provided hard evidence, by applying the Variable Elimination
-        algorithm. The evidence is treated as "hard", meaning that it's treated
-        as exact observations without uncertainty. The method also plots the
-        resulting posterior distributions.
+        algorithm. The evidence is treated as "hard", meaning that it is
+        treated as exact observations without uncertainty. The method also
+        plots the resulting posterior distributions.
 
         Parameters
         ----------
