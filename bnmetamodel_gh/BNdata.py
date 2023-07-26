@@ -1,6 +1,5 @@
 from Helper_functions import getBinRanges, discretize
 
-import copy
 import csv
 
 # requirement: pandas
@@ -138,8 +137,18 @@ class BNdata:
 
     def getBinRanges(self, binTypeDict, numBinsDict):
 
-        # percentileBoolDict should be in the form of {max_def: False, moment_inertia: True, ...}
-        # numBinDict should be in the form of {max_def: 10, moment_inertia: 5, ...}
+        # percentileBoolDict should be in the form of:
+        # {
+        #     "max_def": False,
+        #     "moment_inertia": True,
+        #     ...
+        # }
+        # numBinDict should be in the form of:
+        # {
+        #     "max_def": 10,
+        #     "moment_inertia": 5,
+        #     ...
+        # }
 
         # trainingDf = pd.DataFrame(self.data)
         # trainingDf.columns = trainingDf.iloc[0]
@@ -149,16 +158,24 @@ class BNdata:
         trainingDfDiscterizedRanges = []
         trainingDfDiscterizedRangesDict = {}
 
-        # loop through variables in trainingDf (columns) to discretize into ranges according to trainingDf
         for varName in list(self.data):
+            # looping through variables in trainingDf (columns) to discretize
+            # into ranges according to trainingDf
+
             # key = traininDf.columns
-            # if true, discretise variable i, using percentiles, if false, discretise using equal bins
+
+            # if true, discretise variable i, using percentiles, if false,
+            # discretise using equal bins
             if binTypeDict[varName] == "percentile":
-                trainingDfDiscterizedRanges.append(percentile_bins(self.data[varName], numBinsDict.get(varName)))  # adds to a list
-                trainingDfDiscterizedRangesDict[varName] = percentile_bins(self.data[varName], numBinsDict.get(varName))  # adds to a dictionary
+                # add to list
+                trainingDfDiscterizedRanges.append(percentile_bins(self.data[varName], numBinsDict.get(varName)))
+                # adds to a dict
+                trainingDfDiscterizedRangesDict[varName] = percentile_bins(self.data[varName], numBinsDict.get(varName))
             elif "equal":
-                trainingDfDiscterizedRanges.append(bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName)))  # adds to a list
-                trainingDfDiscterizedRangesDict[varName] = bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName))  # adds to a dictionary
+                # add to list
+                trainingDfDiscterizedRanges.append(bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName)))
+                # adds to a dict
+                trainingDfDiscterizedRangesDict[varName] = bins(max(self.data[varName]), min(self.data[varName]), numBinsDict.get(varName))
 
         # update class attribute, while you're at it
         self.bin_ranges = trainingDfDiscterizedRangesDict
@@ -167,9 +184,18 @@ class BNdata:
 
 
     def discretize(self, binRangesDict, plot=False):
-
-        # percentileBoolDict should be in the form of {max_def: False, moment_inertia: True, ...}
-        # numBinDict should be in the form of {max_def: 10, moment_inertia: 5, ...}
+        # percentileBoolDict should be in the form of:
+        # {
+        #     "max_def": False,
+        #     "moment_inertia": True,
+        #     ...
+        # }
+        # numBinDict should be in the form of:
+        # {
+        #     "max_def": 10,
+        #     "moment_inertia": 5,
+        #     ...
+        # }
 
         # df = pd.DataFrame(data)
         # df.columns = df.iloc[0]
@@ -178,7 +204,8 @@ class BNdata:
 
         binnedDf = pd.DataFrame().reindex_like(self.data)
 
-        binCountsDict = copy.deepcopy(binRangesDict)  # copy trainingDfDiscterizedRangesDict
+        # copy trainingDfDiscterizedRangesDict
+        binCountsDict = copy.deepcopy(binRangesDict)
         for key in binCountsDict:
             for bin in binCountsDict[key]:
                 del bin[:]
