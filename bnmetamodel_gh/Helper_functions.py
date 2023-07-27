@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from itertools import product
-import io
 import copy
 import csv
 import math
@@ -106,8 +105,10 @@ def len_csvdata(csv_file_path):
     """
     data = []
 
-    with io.open(csv_file_path, "rb") as f:
-        reader = csv.reader(f, dialect=csv.excel)
+    with open(csv_file_path, "rb") as f:
+        data = f.read()
+        data = data.decode('utf-8')
+        reader = csv.reader(data, dialect=csv.excel)
 
         for row in reader:
             data.append(row)
@@ -139,7 +140,9 @@ def loadDataFromCSV(csv_file_path, header=False):
     # kfold code in here and return list of lists of indexes
     dataset = []
     with open(csv_file_path, "rb") as csvfile:
-        lines = csv.reader(csvfile)
+        data = csvfile.read()
+        data = data.decode('utf-8')
+        lines = csv.reader(data)
 
         for row in lines:
             dataset.append(row)
@@ -1522,7 +1525,9 @@ def BNskelFromCSV(csvdata, targets):
     if isinstance(csvdata, basestring):
         dataset = []
         with open(csvdata, "rb") as csvfile:
-            lines = csv.reader(csvfile)
+            data = csvfile.read()
+            data = data.decode('utf-8')
+            lines = csv.reader(data)
 
             for row in lines:
                 dataset.append(row)

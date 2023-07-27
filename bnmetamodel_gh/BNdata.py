@@ -11,6 +11,7 @@ import pandas as pd
 # "dimension reduction" wrapper function in BNdata - enables to reduce number
 # of BN input variables.
 
+
 class BNdata:
     """
     The BNdata class is designed for reading, storing and binning data for
@@ -20,7 +21,7 @@ class BNdata:
     """
 
     def __init__(self, csvdata, targetlist, binTypeDict, numBinsDict):
-    # def __init__(self, csvdata, targetlist, **kwargs):
+        # def __init__(self, csvdata, targetlist, **kwargs):
         """
         Initializes the BNdata class.
 
@@ -53,7 +54,9 @@ class BNdata:
             # data is a filepath
             dataset = []
             with open(csvdata, "rb") as csvfile:
-                lines = csv.reader(csvfile)
+                data = csvfile.read()
+                data = data.decode("utf-8")
+                lines = csv.reader(data)
 
                 for row in lines:
                     dataset.append(row)
@@ -108,7 +111,11 @@ class BNdata:
 
         print("binning data complete")
 
-        self.binnedDict, self.binnedData, self.bincountsDict = datadf, datadict, bincountsdict
+        self.binnedDict, self.binnedData, self.bincountsDict = (
+            datadf,
+            datadict,
+            bincountsdict,
+        )
 
     """
     def loadFromCSV(self, header=False):

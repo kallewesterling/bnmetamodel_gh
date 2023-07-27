@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 
 import csv
-import io
 import copy
 import random
 import numbers
@@ -52,7 +51,9 @@ def loadDataset(filename, split, training_data=[], ver_data=[]):
         an empty list.
     """
     with open(filename, "rb") as csvfile:
-        lines = csv.reader(csvfile)
+        data = csvfile.read()
+        data = data.decode('utf-8')
+        lines = csv.reader(data)
         dataset = list(lines)
     training_data.append(dataset[0])
     ver_data.append(dataset[0])
@@ -90,7 +91,9 @@ def loadDataset_sk(filename, training_data=[], ver_data=[]):
         Tuple containing training data and verification data.
     """
     with open(filename, "rb") as csvfile:
-        lines = csv.reader(csvfile)
+        data = csvfile.read()
+        data = data.decode('utf-8')
+        lines = csv.reader(data)
         dataset = list(lines)
     header = dataset[0]
     del dataset[0]
@@ -140,8 +143,10 @@ def generate_training_ver_data(csv_file_path, num_ver_samples):
     # data_array = []
     data = []
 
-    with io.open(csv_file_path, "rb") as f:
-        reader = csv.reader(f, dialect = csv.excel)
+    with open(csv_file_path, "rb") as f:
+        data = f.read()
+        data = data.decode('utf-8')
+        reader = csv.reader(data, dialect = csv.excel)
 
         for row in reader:
             data.append(row)
