@@ -18,6 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import copy
+from functools import reduce
 from itertools import product
 
 
